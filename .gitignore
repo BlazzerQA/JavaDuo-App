@@ -1,0 +1,85 @@
+# Gradle
+.gradle/
+build/
+*/build/
+!gradle-wrapper.jar
+!gradle-wrapper.properties
+.gradle-cache/
+
+# Kotlin
+.kotlin/
+
+# Local configuration files
+local.properties
+secrets.properties
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Build outputs
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+bin/
+gen/
+
+# External native build
+.externalNativeBuild/
+.cxx/
+
+# Crashlytics / Firebase
+google-services.json
+firebase-credentials.json
+
+# Keystore files (security risk!)
+*.jks
+*.keystore
+*.p12
+*.key
+
+# Signing configs
+signingConfigs/
+
+# Navigation safe args (generated)
+*/build/generated/source/navigation-args/
+
+# Generated files
+*/build/generated/
+captures/
+output.json
+output-metadata.json
+
+# Lint reports
+lint/intermediates/
+lint/generated/
+lint/outputs/
+lint/reports/
+
+# Test results
+test-results/
+reports/
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+*~
+
+# Log files
+*.log
+
+# Room schema exports (если включены)
+*/schemas/
+
+# Compose preview / inspection
+inspection/
