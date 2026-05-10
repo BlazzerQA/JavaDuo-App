@@ -10,14 +10,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -33,7 +35,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.javadu.ui.components.LessonCard
+import com.javadu.ui.components.KnowledgeGraph
+import com.javadu.ui.components.RandomQuestionCard
 import com.javadu.ui.theme.DarkBackground
 import com.javadu.ui.theme.JavaGreen
 import com.javadu.viewmodel.HomeViewModel
@@ -42,13 +45,14 @@ import com.javadu.viewmodel.HomeViewModel
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
-    onLessonClick: (Long, Boolean) -> Unit,
+    onNavigateToModule: (Long) -> Unit,
     onNavigateToProfile: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.refreshTodayXp()
+        viewModel.loadRandomQuestion()
     }
 
     Scaffold(
@@ -60,6 +64,15 @@ fun HomeScreen(
                         color = JavaGreen,
                         fontWeight = FontWeight.Bold
                     )
+                },
+                actions = {
+                    IconButton(onClick = onNavigateToProfile) {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = "Профиль",
+                            tint = JavaGreen
+                        )
+                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = DarkBackground
@@ -88,7 +101,7 @@ fun HomeScreen(
             item {
                 val userName = state.user?.name ?: "Друг"
                 Text(
-                    text = "Привет, $userName! 👋",
+                    text = "Привет, $userName! ✨",
                     style = MaterialTheme.typography.displaySmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground
@@ -139,10 +152,31 @@ fun HomeScreen(
                 }
             }
 
-            // Заголовок уроков
+            // Граф знаний
             item {
                 Text(
-                    text = "Уроки",
+                    text = "\u2728 Карта знаний",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+
+                val totalLessonsMap = state.modules.associate { it.id to it.totalLessons }
+
+                KnowledgeGraph(
+                    modifier = Modifier.fillMaxWidth(),
+                    progressMap = state.moduleProgress,
+                    totalLessonsMap = totalLessonsMap,
+                    onNodeClick = onNavigateToModule
+                )
+            }
+
+            // Заголовок случайного вопроса
+            item {
+                Text(
+                    text = "\uD83C\uDFAF Случайный вопрос из собеседований",
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground,
@@ -150,21 +184,11 @@ fun HomeScreen(
                 )
             }
 
-            // Список уроков
-            items(state.lessons) { lesson ->
-                val isCompleted = state.progress.find { it.lessonId == lesson.id }?.isCompleted == true
-                val isUnlocked = viewModel.isLessonUnlocked(lesson.order)
-                val isNext = !isCompleted && isUnlocked &&
-                        (lesson.order == 0 || state.progress.find {
-                            state.lessons.find { l -> l.order == lesson.order - 1 }?.id == it.lessonId
-                        }?.isCompleted == true)
-
-                LessonCard(
-                    lesson = lesson,
-                    isCompleted = isCompleted,
-                    isUnlocked = isUnlocked,
-                    isNext = isNext,
-                    onClick = { onLessonClick(lesson.id, isUnlocked) }
+            // Карточка случайного вопроса
+            item {
+                RandomQuestionCard(
+                    question = state.randomQuestion,
+                    onNextQuestion = { viewModel.loadRandomQuestion() }
                 )
             }
 

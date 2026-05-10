@@ -40,6 +40,12 @@ android {
     buildFeatures {
         compose = true
     }
+
+    packaging {
+        jniLibs {
+            useLegacyPackaging = true
+        }
+    }
 }
 
 dependencies {
@@ -76,6 +82,9 @@ dependencies {
 
     // Coil
     implementation(libs.coil.compose)
+
+    // Gson
+    implementation(libs.gson)
 
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
