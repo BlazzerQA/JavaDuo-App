@@ -1,6 +1,7 @@
 package com.javadu.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -20,12 +21,14 @@ import com.javadu.viewmodel.SettingsViewModel
 
 @Composable
 fun NavGraph(
+    modifier: Modifier = Modifier,
     navController: NavHostController,
     startDestination: String,
     isDarkTheme: Boolean,
     onThemeChange: (Boolean) -> Unit
 ) {
     NavHost(
+        modifier = modifier,
         navController = navController,
         startDestination = startDestination
     ) {

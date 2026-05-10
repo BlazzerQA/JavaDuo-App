@@ -8,4 +8,9 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <!-- Фон для светлой темы -->
+    <color name="light_background">#F6F8FA</color>
+    <!-- Фон для тёмной темы -->
+    <color name="dark_background">#0D1117</color>
 </resources>
