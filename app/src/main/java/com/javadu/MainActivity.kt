@@ -1,6 +1,9 @@
 package com.javadu
 
+import android.animation.ObjectAnimator
 import android.os.Bundle
+import android.view.View
+import android.view.animation.AnticipateInterpolator
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -22,6 +25,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.core.animation.doOnEnd
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
@@ -40,6 +45,9 @@ class MainActivity : ComponentActivity() {
     lateinit var sharedPrefs: SharedPrefs
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Установка SplashScreen ДО super.onCreate()
+        val splashScreen = installSplashScreen()
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
@@ -57,7 +65,6 @@ class MainActivity : ComponentActivity() {
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
 
-                // Показываем BottomBar только на основных экранах
                 val showBottomBar = currentRoute in listOf(
                     Screen.Home.route,
                     Screen.Profile.route,
@@ -93,6 +100,23 @@ class MainActivity : ComponentActivity() {
                         }
                     )
                 }
+            }
+        }
+
+        // Анимация выхода Splash Screen — slide up с ускорением
+        splashScreen.setOnExitAnimationListener { splashScreenView ->
+            val slideUp = ObjectAnimator.ofFloat(
+                splashScreenView.view,
+                View.TRANSLATION_Y,
+                0f,
+                -splashScreenView.view.height.toFloat()
+            )
+
+            slideUp.apply {
+                interpolator = AnticipateInterpolator()
+                duration = 400L
+                doOnEnd { splashScreenView.remove() }
+                start()
             }
         }
     }

@@ -1,24 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Основная тема приложения -->
     <style name="Theme.JavaDuoApp" parent="android:Theme.Material.NoActionBar">
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
 
-    <!-- Splash Theme для совместимости (API < 31) -->
+    <!-- Splash Theme для API 31+ с улучшенной анимацией -->
     <style name="Theme.JavaDuoApp.Starting" parent="Theme.SplashScreen">
-        <!-- Тёмный фон (как основная тема) -->
         <item name="windowSplashScreenBackground">#0D1117</item>
-
-        <!-- Иконка splash screen -->
         <item name="windowSplashScreenAnimatedIcon">@drawable/ic_splash</item>
-
-        <!-- Цвет фона под иконкой (совпадает с фоном окна) -->
         <item name="windowSplashScreenAnimationDuration">1000</item>
         <item name="windowSplashScreenIconBackgroundColor">#0D1117</item>
-
-        <!-- После splash screen показывается основная тема -->
         <item name="postSplashScreenTheme">@style/Theme.JavaDuoApp</item>
     </style>
 </resources>
