@@ -2,35 +2,32 @@ package com.javadu.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.javadu.data.DataInitializer
-import com.javadu.data.database.entities.Lesson
+import com.javadu.data.DatabaseInitializer
+import com.javadu.data.database.entities.InterviewQuestion
+import com.javadu.data.database.entities.Module
+import com.javadu.data.database.entities.ModuleProgress
 import com.javadu.data.database.entities.User
-import com.javadu.data.database.entities.UserProgress
 import com.javadu.data.repository.LessonRepository
 import com.javadu.utils.SharedPrefs
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val repository: LessonRepository,
-    private val sharedPrefs: SharedPrefs
+    private val sharedPrefs: SharedPrefs,
+    private val databaseInitializer: DatabaseInitializer
 ) : ViewModel() {
 
     data class HomeState(
         val user: User? = null,
-        val lessons: List<Lesson> = emptyList(),
-        val progress: List<UserProgress> = emptyList(),
+        val modules: List<Module> = emptyList(),
+        val moduleProgress: Map<Long, ModuleProgress> = emptyMap(),
+        val randomQuestion: InterviewQuestion? = null,
         val isLoading: Boolean = true,
         val todayXp: Int = 0,
         val dailyGoal: Int = 50
@@ -42,12 +39,7 @@ class HomeViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             _state.value = _state.value.copy(todayXp = sharedPrefs.getTodayXp())
-            if (!repository.hasData()) {
-                repository.insertInitialData(
-                    DataInitializer.getInitialLessons(),
-                    DataInitializer.getInitialQuestions()
-                )
-            }
+            databaseInitializer.initialize()
             loadData()
         }
     }
@@ -58,22 +50,15 @@ class HomeViewModel @Inject constructor(
 
             combine(
                 repository.currentUser,
-                repository.allLessons,
-            ) { user, lessons ->
-                user to lessons
-            }.flatMapLatest { (user, lessons) ->
-                val progressFlow: Flow<List<UserProgress>> = user?.id?.let {
-                    repository.getUserProgress(it)
-                } ?: flowOf(emptyList())
-
-                progressFlow.map { progress ->
-                    Triple(user, lessons, progress)
-                }
-            }.collect { (user, lessons, progress) ->
+                repository.allModules,
+                repository.getAllModuleProgress()
+            ) { user, modules, allProgress ->
+                Triple(user, modules, allProgress)
+            }.collect { (user, modules, allProgress) ->
                 _state.value = _state.value.copy(
                     user = user,
-                    lessons = lessons,
-                    progress = progress,
+                    modules = modules,
+                    moduleProgress = allProgress.associateBy { it.moduleId },
                     isLoading = false,
                     dailyGoal = dailyGoal
                 )
@@ -87,16 +72,16 @@ class HomeViewModel @Inject constructor(
         )
     }
 
-    fun isLessonUnlocked(lessonOrder: Int): Boolean {
-        return if (lessonOrder == 0) true
-        else {
-            val prevLesson = state.value.lessons.find { it.order == lessonOrder - 1 }
-            val prevProgress = state.value.progress.find { it.lessonId == prevLesson?.id }
-            prevProgress?.isCompleted == true
+    fun loadRandomQuestion() {
+        viewModelScope.launch {
+            val question = repository.getRandomInterviewQuestion()
+            _state.value = _state.value.copy(randomQuestion = question)
         }
     }
 
-    fun isLessonCompleted(lessonId: Long): Boolean {
-        return state.value.progress.find { it.lessonId == lessonId }?.isCompleted == true
+    fun getModuleProgressPercentage(moduleId: Long, totalLessons: Int): Float {
+        if (totalLessons <= 0) return 0f
+        val completed = state.value.moduleProgress[moduleId]?.completedLessons ?: 0
+        return (completed.toFloat() / totalLessons).coerceIn(0f, 1f)
     }
 }

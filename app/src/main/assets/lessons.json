@@ -1,0 +1,182 @@
+[
+  {
+    "id": 1,
+    "title": "Основы Java",
+    "description": "Переменные, типы данных и операторы",
+    "theory": "Java — объектно-ориентированный язык программирования. Все программы состоят из классов и методов. Переменные используются для хранения данных. Основные типы: int (целое), double (дробное), boolean (логическое), String (строка).",
+    "codeExample": "int age = 25;\nString name = \"Alex\";\nboolean isActive = true;\ndouble price = 19.99;",
+    "xpReward": 20,
+    "order": 0,
+    "moduleId": 1
+  },
+  {
+    "id": 2,
+    "title": "Условные операторы",
+    "description": "if, else и switch",
+    "theory": "Условные операторы позволяют выполнять разный код в зависимости от условия. if проверяет условие, else — альтернативный вариант, а switch позволяет выбирать из нескольких вариантов.",
+    "codeExample": "int score = 85;\nif (score >= 90) {\n    System.out.println(\"A\");\n} else if (score >= 80) {\n    System.out.println(\"B\");\n} else {\n    System.out.println(\"C\");\n}",
+    "xpReward": 20,
+    "order": 1,
+    "moduleId": 1
+  },
+  {
+    "id": 3,
+    "title": "Циклы",
+    "description": "for, while и do-while",
+    "theory": "Циклы позволяют повторять код многократно. for используется, когда известно количество итераций. while — когда условие проверяется перед каждой итерацией. do-while гарантирует хотя бы одно выполнение.",
+    "codeExample": "for (int i = 0; i < 5; i++) {\n    System.out.println(i);\n}\n\nint n = 0;\nwhile (n < 3) {\n    System.out.println(n++);\n}",
+    "xpReward": 20,
+    "order": 2,
+    "moduleId": 1
+  },
+  {
+    "id": 4,
+    "title": "Массивы",
+    "description": "Одномерные и многомерные массивы",
+    "theory": "Массив — это структура данных, хранящая элементы одного типа. В Java массивы имеют фиксированный размер. Для динамических коллекций используют ArrayList.",
+    "codeExample": "int[] numbers = {1, 2, 3, 4, 5};\nSystem.out.println(numbers[0]); // 1\n\nString[] names = new String[3];\nnames[0] = \"Alice\";",
+    "xpReward": 25,
+    "order": 3,
+    "moduleId": 1
+  },
+  {
+    "id": 5,
+    "title": "Теория тестирования",
+    "description": "Виды тестирования, баг-репорты, тест-планы",
+    "theory": "Тестирование ПО — проверка соответствия реального и ожидаемого поведения. Основные виды: функциональное, нефункциональное, ручное и автоматизированное. Баг-репорт описывает дефект: заголовок, шаги воспроизведения, ожидаемый/фактический результат, серьёзность, приоритет.",
+    "codeExample": "Баг-репорт:\n1. Заголовок: аватар не загружается\n2. Шаги: открыть профиль → нажать 'Изменить аватар'\n3. Ожидаемый: открывается галерея\n4. Фактический: ничего не происходит",
+    "xpReward": 20,
+    "order": 0,
+    "moduleId": 2
+  },
+  {
+    "id": 6,
+    "title": "API тестирование",
+    "description": "REST API, HTTP, Postman, коды ответа",
+    "theory": "API Testing — тестирование интерфейсов программирования приложений. REST API использует HTTP методы: GET (получение), POST (создание), PUT (обновление), DELETE (удаление). Основные статусы: 200 OK, 201 Created, 400 Bad Request, 404 Not Found, 500 Internal Server Error.",
+    "codeExample": "// GET запрос\nGET /api/users/1\nResponse: 200 OK\n{\n    \"id\": 1,\n    \"name\": \"Alex\"\n}\n\n// POST запрос\nPOST /api/users\nBody: {\"name\": \"Bob\"}\nResponse: 201 Created",
+    "xpReward": 30,
+    "order": 0,
+    "moduleId": 3
+  },
+  {
+    "id": 7,
+    "title": "UI тестирование",
+    "description": "Selenium WebDriver и Page Object Model",
+    "theory": "UI Testing автоматизирует взаимодействие с пользовательским интерфейсом. Selenium WebDriver позволяет управлять браузером программно. Page Object Model (POM) — паттерн, при котором UI элементы выносятся в отдельный класс для лёгкости поддержки.",
+    "codeExample": "public class LoginPage {\n    @FindBy(id = \"username\")\n    private WebElement usernameField;\n    \n    public void login(String user) {\n        usernameField.sendKeys(user);\n        submitButton.click();\n    }\n}",
+    "xpReward": 35,
+    "order": 0,
+    "moduleId": 4
+  },
+  {
+    "id": 8,
+    "title": "Основы SQL",
+    "description": "SELECT, JOIN, агрегаты, индексы",
+    "theory": "SQL — язык структурированных запросов для работы с реляционными базами данных. Основные команды: SELECT (выборка), INSERT (вставка), UPDATE (обновление), DELETE (удаление). JOIN соединяет таблицы по ключу. Агрегатные функции: COUNT, SUM, AVG, MIN, MAX.",
+    "codeExample": "SELECT u.name, COUNT(o.id) as orders\nFROM users u\nLEFT JOIN orders o ON u.id = o.user_id\nWHERE u.age > 18\nGROUP BY u.id\nHAVING COUNT(o.id) > 1;",
+    "xpReward": 30,
+    "order": 0,
+    "moduleId": 5
+  },
+  {
+    "id": 9,
+    "title": "Java-вопросы на собеседовании",
+    "description": "Частые вопросы по Java",
+    "theory": "На собеседовании по Java чаще всего спрашивают: различия между == и equals(), принципы ООП, работа с коллекциями, многопоточность, исключения, generics, Stream API. Важно понимать внутреннее устройство JVM, HashMap, ArrayList.",
+    "codeExample": "// Чем отличаются ArrayList и LinkedList?\n// ArrayList — динамический массив, быстрый доступ O(1)\n// LinkedList — двусвязный список, быстрая вставка O(1)",
+    "xpReward": 30,
+    "order": 0,
+    "moduleId": 6
+  },
+  {
+    "id": 10,
+    "title": "QA-вопросы на собеседовании",
+    "description": "Частые вопросы по тестированию",
+    "theory": "На позицию QA спрашивают: жизненный цикл бага, уровни тестирования, пирамида тестов, тест-кейсы и чек-листы, работа с API, основы SQL. Практические задачи: написать тест-кейс, составить SQL-запрос, описать баг.",
+    "codeExample": "Тест-кейс: вход с невалидным паролем\n1. Шаги: ввести логин 'user', пароль '123'\n2. Нажать 'Войти'\n3. Ожидаемый: сообщение 'Неверный пароль'\n4. Приоритет: High",
+    "xpReward": 30,
+    "order": 1,
+    "moduleId": 6
+  },
+  {
+    "id": 11,
+    "title": "Основы Git",
+    "description": "Инициализация, commit, clone и status",
+    "theory": "Git — система контроля версий, распределённая. Основные команды: git init (создание репозитория), git add (добавление в индекс), git commit (фиксация изменений), git status (состояние файлов), git clone (клонирование репозитория). Каждый коммит хранит снимок состояния с метаданными: автор, дата, сообщение.",
+    "codeExample": "git init\ngit add README.md\ngit commit -m \"Initial commit\"\ngit status\ngit clone https://github.com/user/repo.git",
+    "xpReward": 20,
+    "order": 0,
+    "moduleId": 7
+  },
+  {
+    "id": 12,
+    "title": "Ветвление в Git",
+    "description": "branch, checkout, merge и конфликты",
+    "theory": "Ветки позволяют разрабатывать функционал независимо. git branch создаёт ветку, git checkout переключает. Слияние через git merge: fast-forward (линейное) и three-way merge (с общим предком). Конфликты возникают при изменении одних строк в разных ветках — разрешаются вручную.",
+    "codeExample": "git branch feature-login\ngit checkout feature-login\n# ... изменения ...\ngit checkout main\ngit merge feature-login\n# при конфликте: правим файл → git add → git commit",
+    "xpReward": 25,
+    "order": 1,
+    "moduleId": 7
+  },
+  {
+    "id": 13,
+    "title": "Работа с удалёнными репозиториями",
+    "description": "remote, push, pull и fetch",
+    "theory": "Удалённые репозитории синхронизируют код между разработчиками. git remote add origin <url> связывает локальный реп. git push отправляет коммиты, git pull забирает и мерджит, git fetch только скачивает изменения без слияния. Важно: push/pull через SSH или HTTPS.",
+    "codeExample": "git remote add origin https://github.com/user/repo.git\ngit push -u origin main\ngit pull origin main\ngit fetch origin\ngit log origin/main --oneline",
+    "xpReward": 25,
+    "order": 2,
+    "moduleId": 7
+  },
+  {
+    "id": 14,
+    "title": "Git: rebase и история",
+    "description": "rebase, cherry-pick, git log",
+    "theory": "git rebase переписывает историю, перемещая коммиты поверх другой ветки — чище история, но опасно для публичных веток. cherry-pick переносит отдельный коммит. git log --graph --oneline визуализирует дерево. git reset отменяет изменения (--soft, --mixed, --hard).",
+    "codeExample": "git rebase main\ngit cherry-pick a1b2c3d\ngit log --graph --oneline\ngit reset --soft HEAD~1",
+    "xpReward": 25,
+    "order": 3,
+    "moduleId": 7
+  },
+  {
+    "id": 15,
+    "title": "Основы Docker",
+    "description": "Образы, контейнеры, Docker Hub",
+    "theory": "Docker — платформа контейнеризации. Образ (image) — шаблон с приложением и зависимостями. Контейнер — запущенный экземпляр образа. Команды: docker build (собрать образ), docker run (запустить), docker ps (список), docker stop (остановить). Docker Hub — реестр образов.",
+    "codeExample": "docker run hello-world\ndocker ps -a\ndocker stop container_id\ndocker rm container_id\ndocker pull nginx",
+    "xpReward": 20,
+    "order": 0,
+    "moduleId": 8
+  },
+  {
+    "id": 16,
+    "title": "Dockerfile",
+    "description": "Написание Dockerfile для сборки образа",
+    "theory": "Dockerfile — инструкция для сборки образа. FROM — базовый образ, COPY/ADD — копирование файлов, RUN — выполнение команд, CMD/ENTRYPOINT — запуск приложения. Многослойная архитектура: каждая инструкция создаёт слой. Лучше объединять RUN для уменьшения размера.",
+    "codeExample": "FROM openjdk:17-jdk-slim\nWORKDIR /app\nCOPY target/app.jar app.jar\nEXPOSE 8080\nCMD [\"java\", \"-jar\", \"app.jar\"]",
+    "xpReward": 25,
+    "order": 1,
+    "moduleId": 8
+  },
+  {
+    "id": 17,
+    "title": "Docker: сети и тома",
+    "description": "Volumes, networks, docker-compose",
+    "theory": "Контейнеры по умолчанию изолированы. Volumes — монтирование директорий хоста для персистентности данных. Networks позволяют контейнерам общаться. docker-compose.yml описывает мультиконтейнерное приложение: сервисы, зависимости, переменные окружения, порты.",
+    "codeExample": "docker volume create mydata\ndocker run -v mydata:/data nginx\n\n# docker-compose.yml\nversion: '3'\nservices:\n  web:\n    image: nginx\n    ports:\n      - '80:80'",
+    "xpReward": 25,
+    "order": 2,
+    "moduleId": 8
+  },
+  {
+    "id": 18,
+    "title": "Docker: CI/CD и production",
+    "description": "Оптимизация, healthcheck, многостадийная сборка",
+    "theory": "Многостадийная сборка: builder-образ собирает JAR, runtime-образ содержит только JRE. Healthcheck проверяет работоспособность. .dockerignore уменьшает контекст сборки. В CI/CD: docker build → docker push → docker-compose pull → restart. Логи: docker logs -f.",
+    "codeExample": "# Многостадийная сборка\nFROM maven:3.9 AS builder\nCOPY . .\nRUN mvn clean package\n\nFROM eclipse-temurin:17-jre\nCOPY --from=builder /app/target/*.jar app.jar\nENTRYPOINT [\"java\", \"-jar\", \"app.jar\"]",
+    "xpReward": 25,
+    "order": 3,
+    "moduleId": 8
+  }
+]

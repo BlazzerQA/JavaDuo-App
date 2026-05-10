@@ -11,11 +11,13 @@ import androidx.navigation.navArgument
 import com.javadu.ui.screens.HomeScreen
 import com.javadu.ui.screens.LessonScreen
 import com.javadu.ui.screens.LoginScreen
+import com.javadu.ui.screens.ModuleLessonsScreen
 import com.javadu.ui.screens.OnboardingScreen
 import com.javadu.ui.screens.ProfileScreen
 import com.javadu.ui.screens.SettingsScreen
 import com.javadu.viewmodel.HomeViewModel
 import com.javadu.viewmodel.LessonViewModel
+import com.javadu.viewmodel.ModuleLessonsViewModel
 import com.javadu.viewmodel.ProfileViewModel
 import com.javadu.viewmodel.SettingsViewModel
 
@@ -56,13 +58,33 @@ fun NavGraph(
             val viewModel: HomeViewModel = hiltViewModel()
             HomeScreen(
                 viewModel = viewModel,
+                onNavigateToModule = { moduleId ->
+                    navController.navigate(Screen.ModuleLessons.createRoute(moduleId))
+                },
+                onNavigateToProfile = {
+                    navController.navigate(Screen.Profile.route)
+                }
+            )
+        }
+
+        composable(
+            route = Screen.ModuleLessons.route,
+            arguments = listOf(
+                navArgument("moduleId") { type = NavType.LongType }
+            )
+        ) { backStackEntry ->
+            val moduleId = backStackEntry.arguments?.getLong("moduleId") ?: 0
+            val viewModel: ModuleLessonsViewModel = hiltViewModel()
+            ModuleLessonsScreen(
+                moduleId = moduleId,
+                viewModel = viewModel,
                 onLessonClick = { lessonId, isUnlocked ->
                     if (isUnlocked) {
                         navController.navigate(Screen.Lesson.createRoute(lessonId))
                     }
                 },
-                onNavigateToProfile = {
-                    navController.navigate(Screen.Profile.route)
+                onBack = {
+                    navController.popBackStack()
                 }
             )
         }

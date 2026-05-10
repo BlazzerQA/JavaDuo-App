@@ -24,6 +24,12 @@ interface LessonDao {
     @Query("DELETE FROM lessons")
     suspend fun deleteAll()
 
+    @Query("SELECT * FROM lessons WHERE moduleId = :moduleId ORDER BY `order` ASC")
+    fun getLessonsByModule(moduleId: Long): Flow<List<Lesson>>
+
     @Query("SELECT COUNT(*) FROM lessons")
     suspend fun getCount(): Int
+
+    @Query("SELECT COUNT(*) FROM lessons WHERE moduleId = :moduleId")
+    suspend fun getCountByModule(moduleId: Long): Int
 }

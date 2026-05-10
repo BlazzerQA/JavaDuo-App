@@ -103,12 +103,19 @@ class LessonViewModel @Inject constructor(
     fun finishLesson(onComplete: () -> Unit) {
         viewModelScope.launch {
             val currentState = _state.value
-            val userId = currentState.user?.id ?: return@launch
-            val lessonId = currentState.lesson?.id ?: return@launch
+            val userId = currentState.user?.id
+            val lessonId = currentState.lesson?.id
+            if (lessonId == null) {
+                onComplete()
+                return@launch
+            }
+            val moduleId = currentState.lesson?.moduleId
             val xp = currentState.totalXp
 
-            repository.completeLesson(userId, lessonId, xp)
-            sharedPrefs.addTodayXp(xp)
+            if (userId != null) {
+                repository.completeLesson(userId, lessonId, xp, moduleId)
+                sharedPrefs.addTodayXp(xp)
+            }
             onComplete()
         }
     }
