@@ -9,12 +9,17 @@ import com.javadu.data.database.entities.UserProgress
 import com.javadu.data.repository.LessonRepository
 import com.javadu.utils.SharedPrefs
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -36,6 +41,7 @@ class HomeViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
+            _state.value = _state.value.copy(todayXp = sharedPrefs.getTodayXp())
             if (!repository.hasData()) {
                 repository.insertInitialData(
                     DataInitializer.getInitialLessons(),
@@ -48,29 +54,37 @@ class HomeViewModel @Inject constructor(
 
     private fun loadData() {
         viewModelScope.launch {
-            val todayXp = sharedPrefs.getTodayXp()
             val dailyGoal = sharedPrefs.dailyGoal
 
             combine(
                 repository.currentUser,
                 repository.allLessons,
-                repository.currentUser
-            ) { user, lessons, _ ->
-                val progress = user?.id?.let {
-                    repository.getUserProgress(it).firstOrNull() ?: emptyList()
-                } ?: emptyList()
-                Triple(user, lessons, progress)
+            ) { user, lessons ->
+                user to lessons
+            }.flatMapLatest { (user, lessons) ->
+                val progressFlow: Flow<List<UserProgress>> = user?.id?.let {
+                    repository.getUserProgress(it)
+                } ?: flowOf(emptyList())
+
+                progressFlow.map { progress ->
+                    Triple(user, lessons, progress)
+                }
             }.collect { (user, lessons, progress) ->
-                _state.value = HomeState(
+                _state.value = _state.value.copy(
                     user = user,
                     lessons = lessons,
                     progress = progress,
                     isLoading = false,
-                    todayXp = todayXp,
                     dailyGoal = dailyGoal
                 )
             }
         }
+    }
+
+    fun refreshTodayXp() {
+        _state.value = _state.value.copy(
+            todayXp = sharedPrefs.getTodayXp()
+        )
     }
 
     fun isLessonUnlocked(lessonOrder: Int): Boolean {
