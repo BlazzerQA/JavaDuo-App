@@ -1,0 +1,50 @@
+[
+  {
+    "id": 1,
+    "title": "Java Core",
+    "description": "Переменные, типы данных, ООП, коллекции",
+    "icon": "code",
+    "order": 0,
+    "totalLessons": 4
+  },
+  {
+    "id": 2,
+    "title": "Теория тестирования",
+    "description": "Виды тестирования, баг-репорты, тест-планы",
+    "icon": "science",
+    "order": 1,
+    "totalLessons": 1
+  },
+  {
+    "id": 3,
+    "title": "API тесты",
+    "description": "REST API, HTTP, Postman, коды ответа",
+    "icon": "cloud",
+    "order": 2,
+    "totalLessons": 1
+  },
+  {
+    "id": 4,
+    "title": "UI тесты",
+    "description": "Selenium WebDriver, Page Object Model",
+    "icon": "web",
+    "order": 3,
+    "totalLessons": 1
+  },
+  {
+    "id": 5,
+    "title": "SQL",
+    "description": "SELECT, JOIN, агрегаты, индексы",
+    "icon": "storage",
+    "order": 4,
+    "totalLessons": 1
+  },
+  {
+    "id": 6,
+    "title": "Собеседование",
+    "description": "Java и QA вопросы для интервью",
+    "icon": "psychology",
+    "order": 5,
+    "totalLessons": 2
+  }
+]

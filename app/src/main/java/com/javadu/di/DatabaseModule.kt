@@ -3,7 +3,10 @@ package com.javadu.di
 import android.content.Context
 import androidx.room.Room
 import com.javadu.data.database.AppDatabase
+import com.javadu.data.database.dao.InterviewQuestionDao
 import com.javadu.data.database.dao.LessonDao
+import com.javadu.data.database.dao.ModuleDao
+import com.javadu.data.database.dao.ModuleProgressDao
 import com.javadu.data.database.dao.QuestionDao
 import com.javadu.data.database.dao.UserDao
 import com.javadu.data.database.dao.UserProgressDao
@@ -41,4 +44,13 @@ object DatabaseModule {
 
     @Provides
     fun provideUserProgressDao(database: AppDatabase): UserProgressDao = database.userProgressDao()
+
+    @Provides
+    fun provideModuleDao(database: AppDatabase): ModuleDao = database.moduleDao()
+
+    @Provides
+    fun provideModuleProgressDao(database: AppDatabase): ModuleProgressDao = database.moduleProgressDao()
+
+    @Provides
+    fun provideInterviewQuestionDao(database: AppDatabase): InterviewQuestionDao = database.interviewQuestionDao()
 }
