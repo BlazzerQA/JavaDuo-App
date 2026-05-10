@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -20,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -53,11 +55,23 @@ fun ModuleCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Иконка модуля
-            Text(
-                text = module.icon,
-                fontSize = 36.sp,
-                modifier = Modifier.padding(end = 12.dp)
-            )
+            val iconRes = resolveModuleIcon(module.icon)
+            if (iconRes != 0) {
+                Icon(
+                    painter = painterResource(id = iconRes),
+                    contentDescription = module.title,
+                    modifier = Modifier
+                        .size(36.dp)
+                        .padding(end = 12.dp),
+                    tint = MaterialTheme.colorScheme.onSurface
+                )
+            } else {
+                Text(
+                    text = module.icon,
+                    fontSize = 36.sp,
+                    modifier = Modifier.padding(end = 12.dp)
+                )
+            }
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
