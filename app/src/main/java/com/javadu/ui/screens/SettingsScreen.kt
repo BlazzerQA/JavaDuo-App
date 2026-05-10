@@ -51,26 +51,27 @@ fun SettingsScreen(
     viewModel: SettingsViewModel,
     isDarkTheme: Boolean,
     onThemeChange: (Boolean) -> Unit,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onNavigateToLogin: () -> Unit
 ) {
     var showClearDataDialog by remember { mutableStateOf(false) }
 
     if (showClearDataDialog) {
         AlertDialog(
             onDismissRequest = { showClearDataDialog = false },
-            title = { Text("Очистить все данные?") },
-            text = { Text("Все данные пользователя, прогресс и настройки будут безвозвратно удалены. Приложение будет перезапущено.") },
+            title = { Text("Очистить данные?") },
+            text = { Text("Пользователь и весь прогресс будут удалены. Вы вернётесь на экран входа.") },
             confirmButton = {
-                TextButton(
-                    onClick = {
-                        viewModel.resetAllData {
-                            onNavigateBack()
+                    TextButton(
+                        onClick = {
+                            viewModel.resetAllData {
+                                onNavigateToLogin()
+                            }
+                            showClearDataDialog = false
                         }
-                        showClearDataDialog = false
+                    ) {
+                        Text("Удалить", color = ErrorRed)
                     }
-                ) {
-                    Text("Очистить", color = ErrorRed)
-                }
             },
             dismissButton = {
                 TextButton(onClick = { showClearDataDialog = false }) {
@@ -176,18 +177,20 @@ fun SettingsScreen(
                     Spacer(modifier = Modifier.width(16.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = "Очистить все данные",
+                            text = "Удалить пользователя",
                             style = MaterialTheme.typography.bodyLarge,
-                            fontWeight = FontWeight.Medium
+                            fontWeight = FontWeight.Medium,
+                            maxLines = 1,
+                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
                         )
                         Text(
-                            text = "Удалить пользователя, прогресс и настройки",
+                            text = "Пользователь и весь прогресс будут удалены",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                     TextButton(onClick = { showClearDataDialog = true }) {
-                        Text("Очистить", color = ErrorRed)
+                        Text("Удалить", color = ErrorRed)
                     }
                 }
             }

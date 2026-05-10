@@ -82,8 +82,6 @@ class LessonRepository @Inject constructor(
     suspend fun resetAllData() {
         userProgressDao.deleteAll()
         userDao.deleteAll()
-        lessonDao.deleteAll()
-        questionDao.deleteAll()
     }
 
     suspend fun getCompletedLessonsCount(userId: Long): Int =

@@ -102,6 +102,11 @@ fun NavGraph(
                 onThemeChange = onThemeChange,
                 onNavigateBack = {
                     navController.popBackStack()
+                },
+                onNavigateToLogin = {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(navController.graph.id) { inclusive = true }
+                    }
                 }
             )
         }
