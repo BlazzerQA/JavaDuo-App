@@ -123,7 +123,7 @@ fun RandomQuestionCard(
                         onClick = { onNextQuestion() },
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("Следующий вопрос")
+                        Text("След.вопрос")
                     }
                 }
             }

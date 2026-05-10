@@ -16,11 +16,19 @@
     "totalLessons": 1
   },
   {
+    "id": 7,
+    "title": "Git",
+    "description": "Ветвление, commit, push, pull, merge и rebase",
+    "icon": "source_control",
+    "order": 2,
+    "totalLessons": 4
+  },
+  {
     "id": 3,
     "title": "API тесты",
     "description": "REST API, HTTP, Postman, коды ответа",
     "icon": "cloud",
-    "order": 2,
+    "order": 3,
     "totalLessons": 1
   },
   {
@@ -28,15 +36,23 @@
     "title": "UI тесты",
     "description": "Selenium WebDriver, Page Object Model",
     "icon": "web",
-    "order": 3,
+    "order": 4,
     "totalLessons": 1
+  },
+  {
+    "id": 8,
+    "title": "Docker",
+    "description": "Контейнеры, образы, Dockerfile, docker-compose",
+    "icon": "deployed_code_account",
+    "order": 5,
+    "totalLessons": 4
   },
   {
     "id": 5,
     "title": "SQL",
     "description": "SELECT, JOIN, агрегаты, индексы",
     "icon": "storage",
-    "order": 4,
+    "order": 6,
     "totalLessons": 1
   },
   {
@@ -44,7 +60,7 @@
     "title": "Собеседование",
     "description": "Java и QA вопросы для интервью",
     "icon": "psychology",
-    "order": 5,
+    "order": 7,
     "totalLessons": 2
   }
 ]

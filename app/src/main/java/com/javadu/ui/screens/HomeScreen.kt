@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -152,6 +153,25 @@ fun HomeScreen(
                 }
             }
 
+            // Заголовок случайного вопроса
+            item {
+                Text(
+                    text = "\uD83C\uDFAF Случайный вопрос из собеседований",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
+            }
+
+            // Карточка случайного вопроса
+            item {
+                RandomQuestionCard(
+                    question = state.randomQuestion,
+                    onNextQuestion = { viewModel.loadRandomQuestion() }
+                )
+            }
+
             // Граф знаний
             item {
                 Text(
@@ -170,25 +190,6 @@ fun HomeScreen(
                     progressMap = state.moduleProgress,
                     totalLessonsMap = totalLessonsMap,
                     onNodeClick = onNavigateToModule
-                )
-            }
-
-            // Заголовок случайного вопроса
-            item {
-                Text(
-                    text = "\uD83C\uDFAF Случайный вопрос из собеседований",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onBackground,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
-            }
-
-            // Карточка случайного вопроса
-            item {
-                RandomQuestionCard(
-                    question = state.randomQuestion,
-                    onNextQuestion = { viewModel.loadRandomQuestion() }
                 )
             }
 

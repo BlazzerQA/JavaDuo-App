@@ -98,5 +98,85 @@
     "xpReward": 30,
     "order": 1,
     "moduleId": 6
+  },
+  {
+    "id": 11,
+    "title": "Основы Git",
+    "description": "Инициализация, commit, clone и status",
+    "theory": "Git — система контроля версий, распределённая. Основные команды: git init (создание репозитория), git add (добавление в индекс), git commit (фиксация изменений), git status (состояние файлов), git clone (клонирование репозитория). Каждый коммит хранит снимок состояния с метаданными: автор, дата, сообщение.",
+    "codeExample": "git init\ngit add README.md\ngit commit -m \"Initial commit\"\ngit status\ngit clone https://github.com/user/repo.git",
+    "xpReward": 20,
+    "order": 0,
+    "moduleId": 7
+  },
+  {
+    "id": 12,
+    "title": "Ветвление в Git",
+    "description": "branch, checkout, merge и конфликты",
+    "theory": "Ветки позволяют разрабатывать функционал независимо. git branch создаёт ветку, git checkout переключает. Слияние через git merge: fast-forward (линейное) и three-way merge (с общим предком). Конфликты возникают при изменении одних строк в разных ветках — разрешаются вручную.",
+    "codeExample": "git branch feature-login\ngit checkout feature-login\n# ... изменения ...\ngit checkout main\ngit merge feature-login\n# при конфликте: правим файл → git add → git commit",
+    "xpReward": 25,
+    "order": 1,
+    "moduleId": 7
+  },
+  {
+    "id": 13,
+    "title": "Работа с удалёнными репозиториями",
+    "description": "remote, push, pull и fetch",
+    "theory": "Удалённые репозитории синхронизируют код между разработчиками. git remote add origin <url> связывает локальный реп. git push отправляет коммиты, git pull забирает и мерджит, git fetch только скачивает изменения без слияния. Важно: push/pull через SSH или HTTPS.",
+    "codeExample": "git remote add origin https://github.com/user/repo.git\ngit push -u origin main\ngit pull origin main\ngit fetch origin\ngit log origin/main --oneline",
+    "xpReward": 25,
+    "order": 2,
+    "moduleId": 7
+  },
+  {
+    "id": 14,
+    "title": "Git: rebase и история",
+    "description": "rebase, cherry-pick, git log",
+    "theory": "git rebase переписывает историю, перемещая коммиты поверх другой ветки — чище история, но опасно для публичных веток. cherry-pick переносит отдельный коммит. git log --graph --oneline визуализирует дерево. git reset отменяет изменения (--soft, --mixed, --hard).",
+    "codeExample": "git rebase main\ngit cherry-pick a1b2c3d\ngit log --graph --oneline\ngit reset --soft HEAD~1",
+    "xpReward": 25,
+    "order": 3,
+    "moduleId": 7
+  },
+  {
+    "id": 15,
+    "title": "Основы Docker",
+    "description": "Образы, контейнеры, Docker Hub",
+    "theory": "Docker — платформа контейнеризации. Образ (image) — шаблон с приложением и зависимостями. Контейнер — запущенный экземпляр образа. Команды: docker build (собрать образ), docker run (запустить), docker ps (список), docker stop (остановить). Docker Hub — реестр образов.",
+    "codeExample": "docker run hello-world\ndocker ps -a\ndocker stop container_id\ndocker rm container_id\ndocker pull nginx",
+    "xpReward": 20,
+    "order": 0,
+    "moduleId": 8
+  },
+  {
+    "id": 16,
+    "title": "Dockerfile",
+    "description": "Написание Dockerfile для сборки образа",
+    "theory": "Dockerfile — инструкция для сборки образа. FROM — базовый образ, COPY/ADD — копирование файлов, RUN — выполнение команд, CMD/ENTRYPOINT — запуск приложения. Многослойная архитектура: каждая инструкция создаёт слой. Лучше объединять RUN для уменьшения размера.",
+    "codeExample": "FROM openjdk:17-jdk-slim\nWORKDIR /app\nCOPY target/app.jar app.jar\nEXPOSE 8080\nCMD [\"java\", \"-jar\", \"app.jar\"]",
+    "xpReward": 25,
+    "order": 1,
+    "moduleId": 8
+  },
+  {
+    "id": 17,
+    "title": "Docker: сети и тома",
+    "description": "Volumes, networks, docker-compose",
+    "theory": "Контейнеры по умолчанию изолированы. Volumes — монтирование директорий хоста для персистентности данных. Networks позволяют контейнерам общаться. docker-compose.yml описывает мультиконтейнерное приложение: сервисы, зависимости, переменные окружения, порты.",
+    "codeExample": "docker volume create mydata\ndocker run -v mydata:/data nginx\n\n# docker-compose.yml\nversion: '3'\nservices:\n  web:\n    image: nginx\n    ports:\n      - '80:80'",
+    "xpReward": 25,
+    "order": 2,
+    "moduleId": 8
+  },
+  {
+    "id": 18,
+    "title": "Docker: CI/CD и production",
+    "description": "Оптимизация, healthcheck, многостадийная сборка",
+    "theory": "Многостадийная сборка: builder-образ собирает JAR, runtime-образ содержит только JRE. Healthcheck проверяет работоспособность. .dockerignore уменьшает контекст сборки. В CI/CD: docker build → docker push → docker-compose pull → restart. Логи: docker logs -f.",
+    "codeExample": "# Многостадийная сборка\nFROM maven:3.9 AS builder\nCOPY . .\nRUN mvn clean package\n\nFROM eclipse-temurin:17-jre\nCOPY --from=builder /app/target/*.jar app.jar\nENTRYPOINT [\"java\", \"-jar\", \"app.jar\"]",
+    "xpReward": 25,
+    "order": 3,
+    "moduleId": 8
   }
 ]

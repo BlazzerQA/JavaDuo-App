@@ -68,20 +68,44 @@ private data class GNode(
     val totalLessons: Int
 )
 
-private data class GEdge(val from: Long, val to: Long)
+private data class GEdge(val from: Long, val to: Long, val isBlocking: Boolean = true)
 
 private val NODES = listOf(
-    GNode(2, 0.50f, 0.10f, R.drawable.logo_ic_testing, "", "Теория тестирования", 3),
-    GNode(1, 0.50f, 0.30f, R.drawable.logo_ic_java,   "", "Java Core",          6),
-    GNode(3, 0.28f, 0.52f, R.drawable.logo_ic_api, "", "API тесты",          6),
-    GNode(4, 0.72f, 0.52f, R.drawable.logo_ic_selenium, "", "UI тесты",           6),
-    GNode(5, 0.50f, 0.74f, R.drawable.logo_ic_sql,      "", "SQL",              6),
-    GNode(6, 0.50f, 0.90f, 0,                          "🎯", "Собеседование",     6),
+    // Уровень 1: База
+    GNode(2, 0.25f, 0.08f, R.drawable.logo_ic_testing, "", "Теория тестирования", 3),
+    GNode(7, 0.75f, 0.08f, R.drawable.logo_ic_git,     "", "Git",     4),
+
+    // Уровень 2: Ядро — по диагонали от теории
+    GNode(1, 0.50f, 0.26f, R.drawable.logo_ic_java,    "", "Java Core", 6),
+
+    // Уровень 3: Ветвление — докер вправо, API и UI вниз симметрично
+    GNode(3, 0.25f, 0.46f, R.drawable.logo_ic_api,       "", "API тесты", 6),
+    GNode(4, 0.50f, 0.46f, R.drawable.logo_ic_selenium,   "", "UI тесты",  6),
+    GNode(8, 0.75f, 0.46f, R.drawable.logo_ic_docker,    "", "Docker",    4),
+
+    // Уровень 4: Конвергенция
+    GNode(5, 0.50f, 0.68f, R.drawable.logo_ic_sql,       "", "SQL",       6),
+
+    // Уровень 5: Финал
+    GNode(6, 0.50f, 0.90f, 0, "🎯", "Собеседование",     6),
 )
 
 private val EDGES = listOf(
-    GEdge(2, 1), GEdge(1, 3), GEdge(1, 4),
-    GEdge(3, 5), GEdge(4, 5), GEdge(5, 6),
+    // Уровень 1 → 2
+    GEdge(2, 7, isBlocking = true),   // Теория -> Git
+    GEdge(2, 1),                      // Теория -> Java Core
+
+    // Уровень 2 → 3
+    GEdge(1, 8, isBlocking = true),   // Java Core -> Docker
+    GEdge(1, 3),                      // Java Core -> API
+    GEdge(1, 4),                      // Java Core -> UI
+
+    // Уровень 3 → 4
+    GEdge(3, 5),                      // API -> SQL
+    GEdge(4, 5),                      // UI -> SQL
+
+    // Уровень 4 → 5
+    GEdge(5, 6),                      // SQL -> Собеседование
 )
 
 /** Статус ноды для визуала */
@@ -108,7 +132,7 @@ fun KnowledgeGraph(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(680.dp)
+            .height(900.dp)
             .pointerInput(Unit) {
                 detectTapGestures { off ->
                     val hit = 50.dp.toPx()
@@ -366,10 +390,11 @@ private fun visual(
     if (done > 0) return NodeVisual.IN_PROGRESS
 
     // Нода ещё не начата — проверяем, разблокирована ли она
-    val parents = EDGES.filter { it.to == id }.map { it.from }
-    val locked = parents.isNotEmpty() && parents.any { parentId ->
-        val parentTotal = tm[parentId] ?: 0
-        val parentDone = pm[parentId]?.completedLessons ?: 0
+    val parentEdges = EDGES.filter { it.to == id }
+    val locked = parentEdges.isNotEmpty() && parentEdges.any { edge ->
+        if (!edge.isBlocking) return@any false // Неблокирующая связь не влияет на лок
+        val parentTotal = tm[edge.from] ?: 0
+        val parentDone = pm[edge.from]?.completedLessons ?: 0
         parentDone < parentTotal
     }
     return if (locked) NodeVisual.LOCKED else NodeVisual.AVAILABLE
