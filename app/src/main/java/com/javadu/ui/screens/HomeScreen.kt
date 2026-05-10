@@ -10,11 +10,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -47,7 +50,8 @@ import com.javadu.viewmodel.HomeViewModel
 fun HomeScreen(
     viewModel: HomeViewModel,
     onNavigateToModule: (Long) -> Unit,
-    onNavigateToProfile: () -> Unit
+    onNavigateToProfile: () -> Unit,
+    onNavigateToShop: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -67,12 +71,39 @@ fun HomeScreen(
                     )
                 },
                 actions = {
-                    IconButton(onClick = onNavigateToProfile) {
-                        Icon(
-                            imageVector = Icons.Default.Person,
-                            contentDescription = "Профиль",
-                            tint = JavaGreen
-                        )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        // Coins display
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.AccountBalanceWallet,
+                                contentDescription = null,
+                                tint = JavaGreen,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Text(
+                                text = "${state.user?.coins ?: 0}",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = JavaGreen
+                            )
+                        }
+                        IconButton(onClick = onNavigateToShop) {
+                            Icon(
+                                imageVector = Icons.Default.ShoppingCart,
+                                contentDescription = "Магазин",
+                                tint = JavaGreen
+                            )
+                        }
+                        IconButton(onClick = onNavigateToProfile) {
+                            Icon(
+                                imageVector = Icons.Default.Person,
+                                contentDescription = "Профиль",
+                                tint = JavaGreen
+                            )
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

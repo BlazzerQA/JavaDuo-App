@@ -32,8 +32,10 @@ import androidx.compose.material.icons.filled.Bed
 import androidx.compose.material.icons.filled.Brightness3
 import androidx.compose.material.icons.filled.Brightness5
 import androidx.compose.material.icons.filled.Brightness6
+import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.LocalCafe
 import androidx.compose.material.icons.filled.MusicNote
@@ -86,7 +88,8 @@ import com.javadu.viewmodel.ProfileViewModel
 @Composable
 fun ProfileScreen(
     viewModel: ProfileViewModel,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onNavigateToShop: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsState()
     var showResetDialog by remember { mutableStateOf(false) }
@@ -263,6 +266,21 @@ fun ProfileScreen(
                 )
                 StatCard(
                     modifier = Modifier.weight(1f),
+                    icon = Icons.Default.AccountBalanceWallet,
+                    value = user.coins.toString(),
+                    label = "CodeCoins",
+                    iconColor = JavaGreen
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                StatCard(
+                    modifier = Modifier.weight(1f),
                     icon = Icons.Default.School,
                     value = state.completedLessons.toString(),
                     label = "Уроков пройдено",
@@ -299,6 +317,33 @@ fun ProfileScreen(
             }
 
             Spacer(modifier = Modifier.height(32.dp))
+
+            // Магазин
+            Button(
+                onClick = onNavigateToShop,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = JavaGreen.copy(alpha = 0.2f),
+                    contentColor = JavaGreen
+                ),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ShoppingCart,
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
+                Text(
+                    text = "Магазин бонусов",
+                    style = MaterialTheme.typography.labelLarge,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
 
             // Кнопка сброса
             Button(

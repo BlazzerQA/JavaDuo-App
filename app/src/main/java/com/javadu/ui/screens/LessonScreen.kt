@@ -15,12 +15,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -51,6 +56,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.graphics.Color
 import com.javadu.ui.components.QuestionCard
 import com.javadu.ui.theme.DarkBackground
 import com.javadu.ui.theme.ErrorRed
@@ -117,6 +123,27 @@ fun LessonScreen(
                         )
                     }
                 },
+                actions = {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        if (state.bonuses.xpBoostActive) {
+                            // Индикатор удвоителя XP
+                            Card(
+                                colors = CardDefaults.cardColors(
+                                    containerColor = JavaGreen.copy(alpha = 0.2f)
+                                ),
+                                shape = RoundedCornerShape(8.dp)
+                            ) {
+                                Text(
+                                    text = "⚡ 2x XP",
+                                    style = MaterialTheme.typography.labelMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = JavaGreen,
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                )
+                            }
+                        }
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = DarkBackground
                 )
@@ -154,6 +181,7 @@ fun LessonScreen(
                 // Экран завершения
                 CompletionScreen(
                     totalXp = state.totalXp,
+                    earnedCoins = state.earnedCoins,
                     correctAnswers = state.correctAnswersCount,
                     totalQuestions = state.questions.size,
                     onFinish = {
@@ -169,12 +197,22 @@ fun LessonScreen(
                     Column(
                         modifier = Modifier.fillMaxSize()
                     ) {
+                        // Панель бонусов
+                        if (!state.isAnswered) {
+                            BonusesBar(
+                                bonuses = state.bonuses,
+                                onUseHint = { viewModel.useHint() },
+                                onActivateXpBoost = { viewModel.activateXpBoost() }
+                            )
+                        }
+
                         QuestionCard(
                             question = currentQuestion,
                             questionNumber = state.currentQuestionIndex + 1,
                             totalQuestions = state.questions.size,
                             selectedOption = state.selectedAnswer,
                             isAnswered = state.isAnswered,
+                            revealedHint = state.revealedHint,
                             onOptionSelected = { viewModel.selectAnswer(it) }
                         )
 
@@ -186,7 +224,8 @@ fun LessonScreen(
                             val isCorrect = state.selectedAnswer == currentQuestion.correctAnswer
                             ResultMessage(
                                 isCorrect = isCorrect,
-                                correctAnswer = currentQuestion.correctAnswer
+                                correctAnswer = currentQuestion.correctAnswer,
+                                insuranceUsed = state.bonuses.usedInsuranceThisQuestion && !isCorrect
                             )
                         }
 
@@ -306,7 +345,81 @@ private fun TheoryScreen(
 }
 
 @Composable
-private fun ResultMessage(isCorrect: Boolean, correctAnswer: String) {
+private fun BonusesBar(
+    bonuses: com.javadu.viewmodel.LessonViewModel.BonusesState,
+    onUseHint: () -> Unit,
+    onActivateXpBoost: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState())
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        // Кнопка подсказки
+        if (bonuses.hintCount > 0 && !bonuses.usedHintThisQuestion) {
+            BonusChip(
+                icon = "💡",
+                label = "Подсказка",
+                count = bonuses.hintCount,
+                onClick = onUseHint
+            )
+        }
+        // Кнопка удвоителя
+        if (bonuses.xpBoostCount > 0 && !bonuses.xpBoostActive) {
+            BonusChip(
+                icon = "⚡",
+                label = "2x XP",
+                count = bonuses.xpBoostCount,
+                onClick = onActivateXpBoost
+            )
+        }
+        // Индикатор страховки (пассивный)
+        if (bonuses.insuranceCount > 0) {
+            BonusChip(
+                icon = "🛡️",
+                label = "Страховка",
+                count = bonuses.insuranceCount,
+                onClick = {},
+                enabled = false
+            )
+        }
+    }
+}
+
+@Composable
+private fun BonusChip(
+    icon: String,
+    label: String,
+    count: Int,
+    onClick: () -> Unit,
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier
+) {
+    Button(
+        onClick = onClick,
+        enabled = enabled,
+        modifier = modifier.height(40.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = if (enabled) JavaGreen.copy(alpha = 0.15f) else JavaGreen.copy(alpha = 0.05f),
+            contentColor = if (enabled) JavaGreen else JavaGreen.copy(alpha = 0.4f),
+            disabledContainerColor = JavaGreen.copy(alpha = 0.05f),
+            disabledContentColor = JavaGreen.copy(alpha = 0.4f)
+        ),
+        shape = RoundedCornerShape(20.dp),
+        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
+    ) {
+        Text(
+            text = "$icon $label ($count)",
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = FontWeight.Medium
+        )
+    }
+}
+
+@Composable
+private fun ResultMessage(isCorrect: Boolean, correctAnswer: String, insuranceUsed: Boolean = false) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -327,13 +440,17 @@ private fun ResultMessage(isCorrect: Boolean, correctAnswer: String) {
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Icon(
-                    imageVector = Icons.Default.CheckCircle,
+                    imageVector = if (isCorrect) Icons.Default.CheckCircle else Icons.Default.Close,
                     contentDescription = null,
                     tint = if (isCorrect) SuccessGreen else ErrorRed,
                     modifier = Modifier.size(24.dp)
                 )
                 Text(
-                    text = if (isCorrect) "Правильно! +5 XP" else "Ошибка",
+                    text = when {
+                        isCorrect -> "Правильно!"
+                        insuranceUsed -> "Ошибка, но страховка сработала!"
+                        else -> "Ошибка"
+                    },
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     color = if (isCorrect) SuccessGreen else ErrorRed
@@ -354,6 +471,7 @@ private fun ResultMessage(isCorrect: Boolean, correctAnswer: String) {
 @Composable
 private fun CompletionScreen(
     totalXp: Int,
+    earnedCoins: Int,
     correctAnswers: Int,
     totalQuestions: Int,
     onFinish: () -> Unit
@@ -391,12 +509,43 @@ private fun CompletionScreen(
                 modifier = Modifier.padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = "+$totalXp XP",
-                    style = MaterialTheme.typography.displayMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = JavaGreen
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Star,
+                        contentDescription = null,
+                        tint = JavaGreen,
+                        modifier = Modifier.size(32.dp)
+                    )
+                    Text(
+                        text = "+$totalXp XP",
+                        style = MaterialTheme.typography.displayMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = JavaGreen
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.AccountBalanceWallet,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Text(
+                        text = "+$earnedCoins Coins",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(16.dp))
 

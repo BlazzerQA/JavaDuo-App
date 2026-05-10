@@ -10,6 +10,7 @@ data class User(
     val name: String,
     val email: String? = null,
     val totalXp: Int = 0,
+    val coins: Int = 0,
     val currentStreak: Int = 0,
     val isGuest: Boolean = false,
     val avatarUri: String? = null,

@@ -15,11 +15,13 @@ import com.javadu.ui.screens.ModuleLessonsScreen
 import com.javadu.ui.screens.OnboardingScreen
 import com.javadu.ui.screens.ProfileScreen
 import com.javadu.ui.screens.SettingsScreen
+import com.javadu.ui.screens.ShopScreen
 import com.javadu.viewmodel.HomeViewModel
 import com.javadu.viewmodel.LessonViewModel
 import com.javadu.viewmodel.ModuleLessonsViewModel
 import com.javadu.viewmodel.ProfileViewModel
 import com.javadu.viewmodel.SettingsViewModel
+import com.javadu.viewmodel.ShopViewModel
 
 @Composable
 fun NavGraph(
@@ -63,6 +65,9 @@ fun NavGraph(
                 },
                 onNavigateToProfile = {
                     navController.navigate(Screen.Profile.route)
+                },
+                onNavigateToShop = {
+                    navController.navigate(Screen.Shop.route)
                 }
             )
         }
@@ -109,6 +114,19 @@ fun NavGraph(
         composable(Screen.Profile.route) {
             val viewModel: ProfileViewModel = hiltViewModel()
             ProfileScreen(
+                viewModel = viewModel,
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onNavigateToShop = {
+                    navController.navigate(Screen.Shop.route)
+                }
+            )
+        }
+
+        composable(Screen.Shop.route) {
+            val viewModel: ShopViewModel = hiltViewModel()
+            ShopScreen(
                 viewModel = viewModel,
                 onNavigateBack = {
                     navController.popBackStack()
