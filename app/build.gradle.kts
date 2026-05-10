@@ -74,6 +74,9 @@ dependencies {
     // Splash Screen
     implementation(libs.androidx.core.splashscreen)
 
+    // Coil
+    implementation(libs.coil.compose)
+
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)

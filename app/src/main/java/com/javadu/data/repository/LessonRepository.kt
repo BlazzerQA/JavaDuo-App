@@ -90,4 +90,12 @@ class LessonRepository @Inject constructor(
     suspend fun getTotalXp(userId: Long): Int {
         return userDao.getUserById(userId)?.totalXp ?: 0
     }
+
+    suspend fun updateAvatarUri(userId: Long, avatarUri: String?) {
+        userDao.updateAvatarUri(userId, avatarUri)
+    }
+
+    suspend fun updateAvatarIcon(userId: Long, avatarIcon: String?) {
+        userDao.updateAvatarIcon(userId, avatarIcon)
+    }
 }
