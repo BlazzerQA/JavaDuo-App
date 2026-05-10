@@ -13,7 +13,7 @@ import com.javadu.data.database.entities.UserProgress
 
 @Database(
     entities = [User::class, Lesson::class, Question::class, UserProgress::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {

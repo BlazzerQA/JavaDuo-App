@@ -20,7 +20,8 @@ class ProfileViewModel @Inject constructor(
     data class ProfileState(
         val user: User? = null,
         val completedLessons: Int = 0,
-        val isLoading: Boolean = true
+        val isLoading: Boolean = true,
+        val showAvatarPicker: Boolean = false
     )
 
     private val _state = MutableStateFlow(ProfileState())
@@ -35,13 +36,13 @@ class ProfileViewModel @Inject constructor(
             repository.currentUser.collect { user ->
                 if (user != null) {
                     val completed = repository.getCompletedLessonsCount(user.id)
-                    _state.value = ProfileState(
+                    _state.value = _state.value.copy(
                         user = user,
                         completedLessons = completed,
                         isLoading = false
                     )
                 } else {
-                    _state.value = ProfileState(isLoading = false)
+                    _state.value = _state.value.copy(isLoading = false)
                 }
             }
         }
@@ -53,5 +54,35 @@ class ProfileViewModel @Inject constructor(
             sharedPrefs.resetTodayXp()
             loadData()
         }
+    }
+
+    fun updateAvatarUri(avatarUri: String?) {
+        viewModelScope.launch {
+            val userId = state.value.user?.id ?: return@launch
+            repository.updateAvatarUri(userId, avatarUri)
+            if (!avatarUri.isNullOrBlank()) {
+                repository.updateAvatarIcon(userId, null)
+            }
+            _state.value = _state.value.copy(showAvatarPicker = false)
+        }
+    }
+
+    fun updateAvatarIcon(avatarIcon: String?) {
+        viewModelScope.launch {
+            val userId = state.value.user?.id ?: return@launch
+            repository.updateAvatarIcon(userId, avatarIcon)
+            if (!avatarIcon.isNullOrBlank()) {
+                repository.updateAvatarUri(userId, null)
+            }
+            _state.value = _state.value.copy(showAvatarPicker = false)
+        }
+    }
+
+    fun showAvatarPicker() {
+        _state.value = _state.value.copy(showAvatarPicker = true)
+    }
+
+    fun dismissAvatarPicker() {
+        _state.value = _state.value.copy(showAvatarPicker = false)
     }
 }

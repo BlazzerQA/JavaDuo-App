@@ -1,9 +1,17 @@
 package com.javadu.ui.screens
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,8 +25,25 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AddAPhoto
+import androidx.compose.material.icons.filled.Android
+import androidx.compose.material.icons.filled.Bathtub
+import androidx.compose.material.icons.filled.Bed
+import androidx.compose.material.icons.filled.Brightness3
+import androidx.compose.material.icons.filled.Brightness5
+import androidx.compose.material.icons.filled.Brightness6
 import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Face
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.LocalCafe
+import androidx.compose.material.icons.filled.MusicNote
+import androidx.compose.material.icons.filled.Pets
+import androidx.compose.material.icons.filled.Rocket
 import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.SentimentSatisfied
+import androidx.compose.material.icons.filled.SportsEsports
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -43,15 +68,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.javadu.ui.theme.DarkBackground
 import com.javadu.ui.theme.ErrorRed
 import com.javadu.ui.theme.JavaGreen
 import com.javadu.viewmodel.ProfileViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun ProfileScreen(
     viewModel: ProfileViewModel,
@@ -59,6 +90,12 @@ fun ProfileScreen(
 ) {
     val state by viewModel.state.collectAsState()
     var showResetDialog by remember { mutableStateOf(false) }
+
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri: Uri? ->
+        uri?.let { viewModel.updateAvatarUri(it.toString()) }
+    }
 
     if (showResetDialog) {
         AlertDialog(
@@ -80,6 +117,18 @@ fun ProfileScreen(
                     Text("Отмена")
                 }
             }
+        )
+    }
+
+    if (state.showAvatarPicker) {
+        AvatarPickerDialog(
+            onDismiss = { viewModel.dismissAvatarPicker() },
+            onPhotoClick = {
+                photoPickerLauncher.launch(
+                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                )
+            },
+            onIconSelected = { viewModel.updateAvatarIcon(it) }
         )
     }
 
@@ -132,20 +181,44 @@ fun ProfileScreen(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Аватар
+            // Аватар (кликабельный)
             Box(
                 modifier = Modifier
                     .size(100.dp)
                     .clip(CircleShape)
-                    .background(JavaGreen.copy(alpha = 0.2f)),
+                    .background(JavaGreen.copy(alpha = 0.2f))
+                    .clickable { viewModel.showAvatarPicker() },
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = user.name.firstOrNull()?.uppercase() ?: "U",
-                    fontSize = 40.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = JavaGreen
-                )
+                when {
+                    !user.avatarUri.isNullOrBlank() -> {
+                        AsyncImage(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(user.avatarUri)
+                                .crossfade(true)
+                                .build(),
+                            contentDescription = "Аватар пользователя",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                    !user.avatarIcon.isNullOrBlank() -> {
+                        val icon = avatarIconMap[user.avatarIcon]
+                        if (icon != null) {
+                            Icon(
+                                imageVector = icon,
+                                contentDescription = "Аватар пользователя",
+                                modifier = Modifier.size(56.dp),
+                                tint = JavaGreen
+                            )
+                        } else {
+                            DefaultAvatarText(user.name)
+                        }
+                    }
+                    else -> {
+                        DefaultAvatarText(user.name)
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -212,7 +285,7 @@ fun ProfileScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = "🔥 ${user.currentStreak}",
+                        text = "\uD83D\uDD25 ${user.currentStreak}",
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface
@@ -250,12 +323,22 @@ fun ProfileScreen(
 }
 
 @Composable
+private fun DefaultAvatarText(name: String) {
+    Text(
+        text = name.firstOrNull()?.uppercase() ?: "U",
+        fontSize = 40.sp,
+        fontWeight = FontWeight.Bold,
+        color = JavaGreen
+    )
+}
+
+@Composable
 private fun StatCard(
     modifier: Modifier = Modifier,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     value: String,
     label: String,
-    iconColor: androidx.compose.ui.graphics.Color
+    iconColor: Color
 ) {
     Card(
         modifier = modifier,
@@ -289,3 +372,108 @@ private fun StatCard(
         }
     }
 }
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun AvatarPickerDialog(
+    onDismiss: () -> Unit,
+    onPhotoClick: () -> Unit,
+    onIconSelected: (String) -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Выберите аватар") },
+        text = {
+            Column {
+                // Кнопка выбора фото
+                Button(
+                    onClick = onPhotoClick,
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(containerColor = JavaGreen.copy(alpha = 0.2f), contentColor = JavaGreen)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.AddAPhoto,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
+                    Text("Выбрать фото")
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = "Или выберите иконку:",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                FlowRow(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterHorizontally),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    avatarOptions.forEach { (key, icon) ->
+                        Box(
+                            modifier = Modifier
+                                .size(48.dp)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.surfaceVariant)
+                                .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.3f), CircleShape)
+                                .clickable { onIconSelected(key) },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = icon,
+                                contentDescription = key,
+                                modifier = Modifier.size(28.dp),
+                                tint = JavaGreen
+                            )
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Закрыть")
+            }
+        }
+    )
+}
+
+private val avatarIconMap = mapOf(
+    "face" to Icons.Default.Face,
+    "android" to Icons.Default.Android,
+    "pets" to Icons.Default.Pets,
+    "star" to Icons.Default.Star,
+    "favorite" to Icons.Default.Favorite,
+    "sports" to Icons.Default.SportsEsports,
+    "music" to Icons.Default.MusicNote,
+    "flower" to Icons.Default.LocalCafe,
+    "smile" to Icons.Default.SentimentSatisfied,
+    "rocket" to Icons.Default.Rocket,
+    "sun" to Icons.Default.WbSunny,
+    "moon" to Icons.Default.Brightness3,
+    "cloud" to Icons.Default.Brightness5,
+    "tv" to Icons.Default.Brightness6,
+    "bed" to Icons.Default.Bed,
+    "bath" to Icons.Default.Bathtub
+)
+
+private val avatarOptions = listOf(
+    "face" to Icons.Default.Face,
+    "android" to Icons.Default.Android,
+    "pets" to Icons.Default.Pets,
+    "star" to Icons.Default.Star,
+    "favorite" to Icons.Default.Favorite,
+    "sports" to Icons.Default.SportsEsports,
+    "music" to Icons.Default.MusicNote,
+    "flower" to Icons.Default.LocalCafe,
+    "smile" to Icons.Default.SentimentSatisfied,
+    "rocket" to Icons.Default.Rocket,
+    "sun" to Icons.Default.WbSunny,
+    "moon" to Icons.Default.Brightness3
+)
