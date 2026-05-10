@@ -30,29 +30,4 @@
         android:strokeWidth="10"
         android:strokeColor="#00FF41"
         android:strokeLineCap="round" />
-
-    <path
-        android:fillColor="#00CC33"
-        android:pathData="M144,32L144,48"
-        android:strokeWidth="6"
-        android:strokeColor="#00FF41"
-        android:strokeLineCap="round" />
-    <path
-        android:fillColor="#00CC33"
-        android:pathData="M144,224L144,240"
-        android:strokeWidth="6"
-        android:strokeColor="#00FF41"
-        android:strokeLineCap="round" />
-    <path
-        android:fillColor="#00CC33"
-        android:pathData="M32,136L48,136"
-        android:strokeWidth="6"
-        android:strokeColor="#00FF41"
-        android:strokeLineCap="round" />
-    <path
-        android:fillColor="#00CC33"
-        android:pathData="M240,136L256,136"
-        android:strokeWidth="6"
-        android:strokeColor="#00FF41"
-        android:strokeLineCap="round" />
 </vector>
