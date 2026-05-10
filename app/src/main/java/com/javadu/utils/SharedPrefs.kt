@@ -50,6 +50,10 @@ class SharedPrefs @Inject constructor(
         prefs.edit().putInt(KEY_TODAY_XP, current + xp).apply()
     }
 
+    fun resetTodayXp() {
+        prefs.edit().putInt(KEY_TODAY_XP, 0).apply()
+    }
+
     fun resetAll() {
         prefs.edit().clear().apply()
     }

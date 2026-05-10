@@ -50,6 +50,7 @@ class ProfileViewModel @Inject constructor(
     fun resetProgress() {
         viewModelScope.launch {
             repository.resetAllProgress()
+            sharedPrefs.resetTodayXp()
             loadData()
         }
     }
