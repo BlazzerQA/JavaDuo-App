@@ -6,7 +6,6 @@ import android.view.View
 import android.view.animation.AnticipateInterpolator
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -49,7 +48,6 @@ class MainActivity : ComponentActivity() {
         val splashScreen = installSplashScreen()
 
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
 
         val startDestination = if (!sharedPrefs.isOnboardingShown) {
             Screen.Onboarding.route
@@ -91,6 +89,7 @@ class MainActivity : ComponentActivity() {
                     }
                 ) { innerPadding ->
                     NavGraph(
+                        modifier = Modifier.padding(innerPadding),
                         navController = navController,
                         startDestination = startDestination,
                         isDarkTheme = isDarkTheme,
