@@ -178,7 +178,6 @@ fun LessonScreen(
                     onStartQuestions = { viewModel.startQuestions() }
                 )
             } else if (state.isCompleted) {
-                // Экран завершения
                 CompletionScreen(
                     totalXp = state.totalXp,
                     earnedCoins = state.earnedCoins,
@@ -189,6 +188,15 @@ fun LessonScreen(
                             onNavigateBack()
                         }
                     }
+                )
+            } else if (state.isFailed) {
+                FailureScreen(
+                    correctAnswers = state.correctAnswersCount,
+                    totalQuestions = state.questions.size,
+                    onRetry = {
+                        viewModel.loadLesson(lessonId)
+                    },
+                    onExit = onNavigateBack
                 )
             } else {
                 // Экран вопросов
@@ -253,6 +261,101 @@ fun LessonScreen(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun FailureScreen(
+    correctAnswers: Int,
+    totalQuestions: Int,
+    onRetry: () -> Unit,
+    onExit: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "😢",
+            fontSize = 80.sp,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
+        Text(
+            text = "Урок не пройден!",
+            style = MaterialTheme.typography.headlineLarge,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant
+            ),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Правильных ответов: $correctAnswers из $totalQuestions",
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = "Нужно минимум 60% правильных ответов",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Button(
+            onClick = onRetry,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = JavaGreen),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Text(
+                text = "Попробовать снова",
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold,
+                color = DarkBackground
+            )
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Button(
+            onClick = onExit,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = ErrorRed.copy(alpha = 0.8f)),
+            shape = RoundedCornerShape(16.dp)
+        ) {
+            Text(
+                text = "Выйти",
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.surface
+            )
         }
     }
 }

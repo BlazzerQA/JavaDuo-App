@@ -41,6 +41,7 @@ class LessonViewModel @Inject constructor(
         val totalXp: Int = 0,
         val earnedCoins: Int = 0,
         val isCompleted: Boolean = false,
+        val isFailed: Boolean = false,
         val isLoading: Boolean = true,
         val showTheory: Boolean = true,
         val bonuses: BonusesState = BonusesState(),
@@ -133,33 +134,45 @@ class LessonViewModel @Inject constructor(
         val nextIndex = currentState.currentQuestionIndex + 1
 
         if (nextIndex >= currentState.questions.size) {
-            // Урок завершён
-            val bonusXp = 10
-            var finalXp = currentState.totalXp + bonusXp
+            val totalQuestions = currentState.questions.size
+            val correctPercentage = if (totalQuestions > 0) {
+                (currentState.correctAnswersCount * 100) / totalQuestions
+            } else 0
 
-            // Если активен удвоитель — удваиваем бонус тоже
-            if (currentState.bonuses.xpBoostActive) {
-                finalXp += 10
-            }
-
-            // Сбрасываем удвоитель XP после урока
-            if (currentState.bonuses.xpBoostActive) {
-                sharedPrefs.clearXpBoost()
-            }
-
-            // Начисляем CodeCoins за урок: 3 coins за каждый правильный ответ + 5 за завершение
-            val earnedCoins = currentState.correctAnswersCount * 3 + 5
-
-            _state.value = currentState.copy(
-                isCompleted = true,
-                totalXp = finalXp,
-                earnedCoins = earnedCoins,
-                bonuses = currentState.bonuses.copy(
-                    xpBoostActive = false,
-                    usedHintThisQuestion = false,
-                    usedInsuranceThisQuestion = false
+            if (correctPercentage < 60) {
+                _state.value = currentState.copy(
+                    isFailed = true,
+                    bonuses = currentState.bonuses.copy(
+                        xpBoostActive = false,
+                        usedHintThisQuestion = false,
+                        usedInsuranceThisQuestion = false
+                    )
                 )
-            )
+            } else {
+                val bonusXp = 10
+                var finalXp = currentState.totalXp + bonusXp
+
+                if (currentState.bonuses.xpBoostActive) {
+                    finalXp += 10
+                }
+
+                if (currentState.bonuses.xpBoostActive) {
+                    sharedPrefs.clearXpBoost()
+                }
+
+                val earnedCoins = currentState.correctAnswersCount * 3 + 5
+
+                _state.value = currentState.copy(
+                    isCompleted = true,
+                    totalXp = finalXp,
+                    earnedCoins = earnedCoins,
+                    bonuses = currentState.bonuses.copy(
+                        xpBoostActive = false,
+                        usedHintThisQuestion = false,
+                        usedInsuranceThisQuestion = false
+                    )
+                )
+            }
         } else {
             _state.value = currentState.copy(
                 currentQuestionIndex = nextIndex,
