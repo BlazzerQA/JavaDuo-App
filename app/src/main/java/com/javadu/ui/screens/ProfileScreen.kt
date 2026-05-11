@@ -4,6 +4,8 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -19,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -62,6 +65,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -70,15 +74,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.javadu.data.database.entities.LevelInfo
 import com.javadu.ui.theme.DarkBackground
 import com.javadu.ui.theme.ErrorRed
 import com.javadu.ui.theme.JavaGreen
@@ -250,9 +257,13 @@ fun ProfileScreen(
                 )
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
-            // Статистика
+            state.levelInfo?.let { levelInfo ->
+                LevelCard(levelInfo = levelInfo)
+                Spacer(modifier = Modifier.height(24.dp))
+            }
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -522,3 +533,149 @@ private val avatarOptions = listOf(
     "sun" to Icons.Default.WbSunny,
     "moon" to Icons.Default.Brightness3
 )
+
+@Composable
+private fun LevelCard(levelInfo: LevelInfo) {
+    val progressAnim = remember { Animatable(0f) }
+    
+    LaunchedEffect(levelInfo.progress) {
+        progressAnim.animateTo(
+            targetValue = levelInfo.progress,
+            animationSpec = tween(durationMillis = 800)
+        )
+    }
+
+    val tierColor = when (levelInfo.tier) {
+        LevelInfo.Tier.BEGINNER -> Color(0xFF7C7C7C)
+        LevelInfo.Tier.APPRENTICE -> Color(0xFFC4A484)
+        LevelInfo.Tier.JUNIOR -> Color(0xFF4CAF50)
+        LevelInfo.Tier.MID -> Color(0xFF2196F3)
+        LevelInfo.Tier.SENIOR -> Color(0xFF9C27B0)
+        LevelInfo.Tier.EXPERT -> Color(0xFFFF9800)
+        LevelInfo.Tier.MASTER -> Color(0xFFF44336)
+        LevelInfo.Tier.GRANDMASTER -> Color(0xFFFFD700)
+    }
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        ),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(48.dp)
+                            .clip(CircleShape)
+                            .background(
+                                Brush.linearGradient(
+                                    colors = listOf(tierColor, tierColor.copy(alpha = 0.5f))
+                                )
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Star,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(28.dp)
+                        )
+                    }
+                    Column {
+                        Text(
+                            text = "Уровень ${levelInfo.level}",
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = levelInfo.title,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = tierColor,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+                Text(
+                    text = "${levelInfo.tier.displayName}",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = tierColor,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(24.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color(0xFF2D2D2D)),
+                contentAlignment = Alignment.Center
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth(progressAnim.value)
+                        .height(24.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(
+                            Brush.horizontalGradient(
+                                colors = listOf(tierColor, tierColor.copy(alpha = 0.7f))
+                            )
+                        )
+                )
+                Text(
+                    text = "${(levelInfo.progress * 100).toInt()}%",
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                    modifier = Modifier.align(Alignment.Center),
+                    textAlign = TextAlign.Center
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "${levelInfo.currentXp} XP",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = "${levelInfo.nextLevelXp} XP",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            if (levelInfo.leveledUp) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "\uD83C\uDF89 Уровень повышен! \uD83C\uDF89",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = tierColor,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+    }
+}

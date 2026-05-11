@@ -45,7 +45,8 @@ class LessonViewModel @Inject constructor(
         val isLoading: Boolean = true,
         val showTheory: Boolean = true,
         val bonuses: BonusesState = BonusesState(),
-        val revealedHint: String? = null
+        val revealedHint: String? = null,
+        val userXpBeforeLesson: Int = 0
     )
 
     private val _state = MutableStateFlow(LessonState())
@@ -68,7 +69,8 @@ class LessonViewModel @Inject constructor(
                 questions = questions,
                 user = user,
                 isLoading = false,
-                bonuses = bonuses
+                bonuses = bonuses,
+                userXpBeforeLesson = user?.totalXp ?: 0
             )
         }
     }
@@ -150,10 +152,10 @@ class LessonViewModel @Inject constructor(
                 )
             } else {
                 val bonusXp = 10
-                var finalXp = currentState.totalXp + bonusXp
+                var earnedXp = currentState.totalXp + bonusXp
 
                 if (currentState.bonuses.xpBoostActive) {
-                    finalXp += 10
+                    earnedXp += 10
                 }
 
                 if (currentState.bonuses.xpBoostActive) {
@@ -164,13 +166,14 @@ class LessonViewModel @Inject constructor(
 
                 _state.value = currentState.copy(
                     isCompleted = true,
-                    totalXp = finalXp,
+                    totalXp = earnedXp,
                     earnedCoins = earnedCoins,
                     bonuses = currentState.bonuses.copy(
                         xpBoostActive = false,
                         usedHintThisQuestion = false,
                         usedInsuranceThisQuestion = false
-                    )
+                    ),
+                    userXpBeforeLesson = currentState.user?.totalXp ?: 0
                 )
             }
         } else {

@@ -46,6 +46,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -57,6 +58,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Brush
+import com.javadu.data.database.entities.LevelInfo
+import com.javadu.data.database.entities.LevelSystem
 import com.javadu.ui.components.QuestionCard
 import com.javadu.ui.theme.DarkBackground
 import com.javadu.ui.theme.ErrorRed
@@ -178,11 +182,14 @@ fun LessonScreen(
                     onStartQuestions = { viewModel.startQuestions() }
                 )
             } else if (state.isCompleted) {
+                val xpEarned = state.totalXp
+                val totalXpAfter = state.userXpBeforeLesson + xpEarned
                 CompletionScreen(
-                    totalXp = state.totalXp,
+                    totalXp = xpEarned,
                     earnedCoins = state.earnedCoins,
                     correctAnswers = state.correctAnswersCount,
                     totalQuestions = state.questions.size,
+                    currentTotalXp = totalXpAfter,
                     onFinish = {
                         viewModel.finishLesson {
                             onNavigateBack()
@@ -577,8 +584,25 @@ private fun CompletionScreen(
     earnedCoins: Int,
     correctAnswers: Int,
     totalQuestions: Int,
+    currentTotalXp: Int = 0,
     onFinish: () -> Unit
 ) {
+    val levelInfo = remember(currentTotalXp) { LevelSystem.getLevelInfo(currentTotalXp) }
+    val previousLevel = remember { mutableStateOf(LevelSystem.getLevelInfo(currentTotalXp - totalXp).level) }
+    val leveledUp = levelInfo.level > previousLevel.value
+    
+    var showLevelUp by remember { mutableStateOf(false) }
+    var leveledUpFrom by remember { mutableIntStateOf(previousLevel.value) }
+    var leveledUpTo by remember { mutableIntStateOf(levelInfo.level) }
+    
+    LaunchedEffect(leveledUp) {
+        if (leveledUp) {
+            showLevelUp = true
+            leveledUpFrom = previousLevel.value
+            leveledUpTo = levelInfo.level
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -586,6 +610,52 @@ private fun CompletionScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+        if (showLevelUp) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(
+                        Brush.linearGradient(
+                            colors = listOf(
+                                Color(0xFFFFD700),
+                                Color(0xFFFFA500),
+                                Color(0xFFFFD700)
+                            )
+                        )
+                    )
+                    .padding(24.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "🎉 УРОВЕНЬ ПОВЫШЕН! 🎉",
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF1a1a1a)
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Уровень $leveledUpFrom → $leveledUpTo",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF1a1a1a)
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = levelInfo.title,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Medium,
+                        color = Color(0xFF1a1a1a)
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
         Text(
             text = "🎉",
             fontSize = 80.sp,

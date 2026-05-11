@@ -17,6 +17,8 @@ import com.javadu.data.database.entities.Question
 import com.javadu.data.database.entities.User
 import com.javadu.data.database.entities.UserBonus
 import com.javadu.data.database.entities.UserProgress
+import com.javadu.data.database.entities.LevelInfo
+import com.javadu.data.database.entities.LevelSystem
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
@@ -158,6 +160,13 @@ class LessonRepository @Inject constructor(
 
     suspend fun getTotalXp(userId: Long): Int {
         return userDao.getUserById(userId)?.totalXp ?: 0
+    }
+
+    fun getLevelInfo(totalXp: Int): LevelInfo = LevelSystem.getLevelInfo(totalXp)
+
+    suspend fun getUserLevelInfo(userId: Long): LevelInfo {
+        val totalXp = getTotalXp(userId)
+        return getLevelInfo(totalXp)
     }
 
     // ========== Бонусы ==========
