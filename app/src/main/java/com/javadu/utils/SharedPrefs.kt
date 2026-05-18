@@ -20,6 +20,7 @@ class SharedPrefs @Inject constructor(
         private const val KEY_DAILY_GOAL = "daily_goal"
         private const val KEY_LAST_ACTIVE_DATE = "last_active_date"
         private const val KEY_TODAY_XP = "today_xp"
+        private const val KEY_XP_BOOST_ACTIVE = "xp_boost_active"
     }
 
     var isOnboardingShown: Boolean
@@ -56,6 +57,19 @@ class SharedPrefs @Inject constructor(
 
     fun resetAll() {
         prefs.edit().clear().apply()
+    }
+
+    // XP Boost (Удвоитель XP) — привязан к сессии, обычно активен для следующего урока
+    fun activateXpBoost() {
+        prefs.edit().putBoolean(KEY_XP_BOOST_ACTIVE, true).apply()
+    }
+
+    fun isXpBoostActive(): Boolean {
+        return prefs.getBoolean(KEY_XP_BOOST_ACTIVE, false)
+    }
+
+    fun clearXpBoost() {
+        prefs.edit().putBoolean(KEY_XP_BOOST_ACTIVE, false).apply()
     }
 
     private fun getTodayDate(): String {

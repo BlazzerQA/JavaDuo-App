@@ -2,6 +2,7 @@ package com.javadu.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.javadu.data.database.entities.LevelInfo
 import com.javadu.data.database.entities.User
 import com.javadu.data.repository.LessonRepository
 import com.javadu.utils.SharedPrefs
@@ -20,6 +21,7 @@ class ProfileViewModel @Inject constructor(
     data class ProfileState(
         val user: User? = null,
         val completedLessons: Int = 0,
+        val levelInfo: LevelInfo? = null,
         val isLoading: Boolean = true,
         val showAvatarPicker: Boolean = false
     )
@@ -36,15 +38,25 @@ class ProfileViewModel @Inject constructor(
             repository.currentUser.collect { user ->
                 if (user != null) {
                     val completed = repository.getCompletedLessonsCount(user.id)
+                    val level = repository.getLevelInfo(user.totalXp)
                     _state.value = _state.value.copy(
                         user = user,
                         completedLessons = completed,
+                        levelInfo = level,
                         isLoading = false
                     )
                 } else {
                     _state.value = _state.value.copy(isLoading = false)
                 }
             }
+        }
+    }
+
+    fun refreshLevel() {
+        viewModelScope.launch {
+            val user = state.value.user ?: return@launch
+            val level = repository.getLevelInfo(user.totalXp)
+            _state.value = _state.value.copy(levelInfo = level)
         }
     }
 

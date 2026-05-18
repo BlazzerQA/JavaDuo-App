@@ -328,29 +328,29 @@ fun KnowledgeGraph(
                     )
                 }
 
-                /* баджи */
+                /* баджи поверх иконки */
                 when (vis) {
                     NodeVisual.LOCKED -> {
                         Text(
                             text = "\uD83D\uDD12",
-                            fontSize = 18.sp,
+                            fontSize = 22.sp,
                             modifier = Modifier
                                 .align(Alignment.BottomEnd)
-                                .offset(x = (-2).dp, y = 2.dp)
+                                .offset(x = (-4).dp, y = 6.dp)
                         )
                     }
                     NodeVisual.DONE -> {
                         Box(
                             modifier = Modifier
                                 .align(Alignment.BottomEnd)
-                                .offset(x = (-2).dp, y = 2.dp)
-                                .size(18.dp)
+                                .offset(x = (-4).dp, y = 6.dp)
+                                .size(22.dp)
                                 .background(Color(0xFF00E676), CircleShape),
                             contentAlignment = Alignment.Center
                         ) {
                             Text(
                                 text = "\u2713",
-                                fontSize = 10.sp,
+                                fontSize = 14.sp,
                                 color = Color.Black,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.offset(y = (-1).dp)
@@ -361,12 +361,12 @@ fun KnowledgeGraph(
                         val pctText = "${(pct * 100).toInt()}%"
                         Text(
                             text = pctText,
-                            fontSize = 10.sp,
+                            fontSize = 12.sp,
                             color = Color(0xFFFFA726),
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier
                                 .align(Alignment.BottomCenter)
-                                .offset(y = 8.dp)
+                                .offset(y = 10.dp)
                         )
                     }
                     else -> {}

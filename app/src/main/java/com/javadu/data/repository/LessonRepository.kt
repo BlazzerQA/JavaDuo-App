@@ -5,15 +5,23 @@ import com.javadu.data.database.dao.LessonDao
 import com.javadu.data.database.dao.ModuleDao
 import com.javadu.data.database.dao.ModuleProgressDao
 import com.javadu.data.database.dao.QuestionDao
+import com.javadu.data.database.dao.UnitDao
+import com.javadu.data.database.dao.UserBonusDao
 import com.javadu.data.database.dao.UserDao
 import com.javadu.data.database.dao.UserProgressDao
+import com.javadu.data.database.entities.BonusType
 import com.javadu.data.database.entities.InterviewQuestion
 import com.javadu.data.database.entities.Lesson
 import com.javadu.data.database.entities.Module
 import com.javadu.data.database.entities.ModuleProgress
 import com.javadu.data.database.entities.Question
+import com.javadu.data.database.entities.Unit
 import com.javadu.data.database.entities.User
+import com.javadu.data.database.entities.UserBonus
 import com.javadu.data.database.entities.UserProgress
+import com.javadu.data.database.entities.LevelInfo
+import com.javadu.data.database.entities.LevelSystem
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
@@ -27,7 +35,9 @@ class LessonRepository @Inject constructor(
     private val userProgressDao: UserProgressDao,
     private val moduleDao: ModuleDao,
     private val moduleProgressDao: ModuleProgressDao,
-    private val interviewQuestionDao: InterviewQuestionDao
+    private val interviewQuestionDao: InterviewQuestionDao,
+    private val userBonusDao: UserBonusDao,
+    private val unitDao: UnitDao
 ) {
     val currentUser: Flow<User?> = userDao.getUser()
     val allLessons: Flow<List<Lesson>> = lessonDao.getAllLessons()
@@ -71,6 +81,19 @@ class LessonRepository @Inject constructor(
         userDao.addXp(userId, xp)
     }
 
+    suspend fun addCoins(userId: Long, coins: Int) {
+        userDao.addCoins(userId, coins)
+    }
+
+    suspend fun spendCoins(userId: Long, coins: Int): Boolean {
+        val affected = userDao.spendCoins(userId, coins)
+        return affected > 0
+    }
+
+    suspend fun getUserCoins(userId: Long): Int {
+        return userDao.getUserById(userId)?.coins ?: 0
+    }
+
     suspend fun completeLesson(userId: Long, lessonId: Long, xpEarned: Int, moduleId: Long?) {
         val progress = UserProgress(
             userId = userId,
@@ -90,7 +113,38 @@ class LessonRepository @Inject constructor(
                 completedLessons = currentModuleProgress.completedLessons + 1
             )
             moduleProgressDao.insertOrUpdateProgress(updatedProgress)
+
+            checkForNewUnits(userId, mid)
         }
+    }
+
+    private suspend fun checkForNewUnits(userId: Long, moduleId: Long) {
+        val allUnits = unitDao.getAllUnits().firstOrNull() ?: return
+        val unitsForModule = allUnits.filter { it.moduleId == moduleId }
+        if (unitsForModule.isEmpty()) return
+
+        val existingUserUnits = unitDao.getAllUserUnits().firstOrNull() ?: emptyList()
+        val existingUnitIds = existingUserUnits.map { it.unitId }.toSet()
+
+        val newUnits = unitsForModule.filter { it.id !in existingUnitIds }
+        if (newUnits.isNotEmpty()) {
+            val userUnits = newUnits.map { unit ->
+                com.javadu.data.database.entities.UserUnit(
+                    unitId = unit.id,
+                    isHired = false,
+                    level = 1,
+                    currentHp = unit.baseHp
+                )
+            }
+            unitDao.insertUserUnits(userUnits)
+        }
+    }
+
+    suspend fun getNewlyAvailableUnits(moduleId: Long): List<Unit> {
+        val allUnits = unitDao.getAllUnits().firstOrNull() ?: return emptyList()
+        val existingUserUnits = unitDao.getAllUserUnits().firstOrNull() ?: return emptyList()
+        val existingUnitIds = existingUserUnits.map { it.unitId }.toSet()
+        return allUnits.filter { it.moduleId == moduleId && it.id !in existingUnitIds }
     }
 
     fun getUserProgress(userId: Long): Flow<List<UserProgress>> =
@@ -141,6 +195,41 @@ class LessonRepository @Inject constructor(
 
     suspend fun getTotalXp(userId: Long): Int {
         return userDao.getUserById(userId)?.totalXp ?: 0
+    }
+
+    fun getLevelInfo(totalXp: Int): LevelInfo = LevelSystem.getLevelInfo(totalXp)
+
+    suspend fun getUserLevelInfo(userId: Long): LevelInfo {
+        val totalXp = getTotalXp(userId)
+        return getLevelInfo(totalXp)
+    }
+
+    // ========== Бонусы ==========
+
+    fun getUserBonuses(userId: Long): kotlinx.coroutines.flow.Flow<List<UserBonus>> =
+        userBonusDao.getUserBonuses(userId)
+
+    suspend fun purchaseBonus(userId: Long, type: BonusType, price: Int): Boolean {
+        val success = spendCoins(userId, price)
+        if (!success) return false
+        val existing = userBonusDao.getBonusByType(userId, type)
+        if (existing != null) {
+            userBonusDao.addBonusQuantity(userId, type, 1)
+        } else {
+            userBonusDao.insertBonus(UserBonus(userId = userId, bonusType = type, quantity = 1))
+        }
+        return true
+    }
+
+    suspend fun useBonus(userId: Long, type: BonusType): Boolean {
+        val bonus = userBonusDao.getBonusByType(userId, type)
+        if (bonus == null || bonus.quantity <= 0) return false
+        userBonusDao.useBonus(userId, type)
+        return true
+    }
+
+    suspend fun getBonusQuantity(userId: Long, type: BonusType): Int {
+        return userBonusDao.getBonusByType(userId, type)?.quantity ?: 0
     }
 
     suspend fun updateAvatarUri(userId: Long, avatarUri: String?) {

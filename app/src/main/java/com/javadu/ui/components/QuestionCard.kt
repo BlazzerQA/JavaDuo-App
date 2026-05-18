@@ -2,6 +2,7 @@ package com.javadu.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -15,6 +16,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -29,6 +31,7 @@ fun QuestionCard(
     totalQuestions: Int,
     selectedOption: String?,
     isAnswered: Boolean,
+    revealedHint: String? = null,
     onOptionSelected: (String) -> Unit
 ) {
     Column(
@@ -57,7 +60,37 @@ fun QuestionCard(
                 fontWeight = FontWeight.Medium
             )
         }
-        Spacer(modifier = Modifier.height(24.dp))
+        // Показываем подсказку, если использована
+        if (!revealedHint.isNullOrBlank()) {
+            Spacer(modifier = Modifier.height(12.dp))
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = JavaGreen.copy(alpha = 0.1f)
+                ),
+                shape = RoundedCornerShape(8.dp)
+            ) {
+                Row(
+                    modifier = Modifier.padding(12.dp),
+                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "💡 Правильный ответ: ",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = JavaGreen,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = revealedHint,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.White
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(12.dp))
+        } else {
+            Spacer(modifier = Modifier.height(24.dp))
+        }
 
         val options = remember(question) {
             listOf(question.option1, question.option2, question.option3).shuffled()

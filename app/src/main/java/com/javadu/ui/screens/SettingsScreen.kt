@@ -213,7 +213,7 @@ fun SettingsScreen(
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     InfoRow(label = "Название", value = "JavaDuo")
-                    InfoRow(label = "Версия", value = "1.0.0")
+                    InfoRow(label = "Версия", value = "1.0.3")
                     InfoRow(label = "Описание", value = "Изучай Java и AQA в игровом формате")
                 }
             }

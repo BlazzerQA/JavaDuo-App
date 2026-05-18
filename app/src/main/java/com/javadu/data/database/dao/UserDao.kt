@@ -32,6 +32,12 @@ interface UserDao {
     @Query("UPDATE users SET totalXp = totalXp + :xp WHERE id = :userId")
     suspend fun addXp(userId: Long, xp: Int)
 
+    @Query("UPDATE users SET coins = coins + :coins WHERE id = :userId")
+    suspend fun addCoins(userId: Long, coins: Int)
+
+    @Query("UPDATE users SET coins = coins - :coins WHERE id = :userId AND coins >= :coins")
+    suspend fun spendCoins(userId: Long, coins: Int): Int
+
     @Query("UPDATE users SET avatarUri = :avatarUri WHERE id = :userId")
     suspend fun updateAvatarUri(userId: Long, avatarUri: String?)
 

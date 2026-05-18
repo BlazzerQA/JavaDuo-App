@@ -76,12 +76,17 @@ class MainActivity : ComponentActivity() {
                             BottomNavigationBar(
                                 currentRoute = currentRoute,
                                 onNavigate = { route ->
-                                    navController.navigate(route) {
-                                        popUpTo(navController.graph.findStartDestination().id) {
-                                            saveState = true
+                                    if (route == Screen.Home.route) {
+                                        // Для Home — делаем pop всего над Home, чтобы вернуться к корню
+                                        navController.popBackStack(Screen.Home.route, inclusive = false)
+                                    } else {
+                                        navController.navigate(route) {
+                                            popUpTo(Screen.Home.route) {
+                                                saveState = true
+                                            }
+                                            launchSingleTop = true
+                                            restoreState = true
                                         }
-                                        launchSingleTop = true
-                                        restoreState = true
                                     }
                                 }
                             )
