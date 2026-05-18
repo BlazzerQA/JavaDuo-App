@@ -8,6 +8,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.javadu.ui.screens.BattleScreen
 import com.javadu.ui.screens.HomeScreen
 import com.javadu.ui.screens.LessonScreen
 import com.javadu.ui.screens.LoginScreen
@@ -16,6 +17,7 @@ import com.javadu.ui.screens.OnboardingScreen
 import com.javadu.ui.screens.ProfileScreen
 import com.javadu.ui.screens.SettingsScreen
 import com.javadu.ui.screens.ShopScreen
+import com.javadu.viewmodel.BattleViewModel
 import com.javadu.viewmodel.HomeViewModel
 import com.javadu.viewmodel.LessonViewModel
 import com.javadu.viewmodel.ModuleLessonsViewModel
@@ -68,6 +70,9 @@ fun NavGraph(
                 },
                 onNavigateToShop = {
                     navController.navigate(Screen.Shop.route)
+                },
+                onNavigateToBattle = {
+                    navController.navigate(Screen.Battle.route)
                 }
             )
         }
@@ -147,6 +152,16 @@ fun NavGraph(
                     navController.navigate(Screen.Login.route) {
                         popUpTo(navController.graph.id) { inclusive = true }
                     }
+                }
+            )
+        }
+
+        composable(Screen.Battle.route) {
+            val viewModel: BattleViewModel = hiltViewModel()
+            BattleScreen(
+                viewModel = viewModel,
+                onNavigateBack = {
+                    navController.popBackStack()
                 }
             )
         }

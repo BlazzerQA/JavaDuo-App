@@ -5,6 +5,7 @@ import com.javadu.data.database.dao.LessonDao
 import com.javadu.data.database.dao.ModuleDao
 import com.javadu.data.database.dao.ModuleProgressDao
 import com.javadu.data.database.dao.QuestionDao
+import com.javadu.data.database.dao.UnitDao
 import com.javadu.data.database.dao.UserBonusDao
 import com.javadu.data.database.dao.UserDao
 import com.javadu.data.database.dao.UserProgressDao
@@ -14,11 +15,13 @@ import com.javadu.data.database.entities.Lesson
 import com.javadu.data.database.entities.Module
 import com.javadu.data.database.entities.ModuleProgress
 import com.javadu.data.database.entities.Question
+import com.javadu.data.database.entities.Unit
 import com.javadu.data.database.entities.User
 import com.javadu.data.database.entities.UserBonus
 import com.javadu.data.database.entities.UserProgress
 import com.javadu.data.database.entities.LevelInfo
 import com.javadu.data.database.entities.LevelSystem
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject
@@ -33,7 +36,8 @@ class LessonRepository @Inject constructor(
     private val moduleDao: ModuleDao,
     private val moduleProgressDao: ModuleProgressDao,
     private val interviewQuestionDao: InterviewQuestionDao,
-    private val userBonusDao: UserBonusDao
+    private val userBonusDao: UserBonusDao,
+    private val unitDao: UnitDao
 ) {
     val currentUser: Flow<User?> = userDao.getUser()
     val allLessons: Flow<List<Lesson>> = lessonDao.getAllLessons()
@@ -109,7 +113,38 @@ class LessonRepository @Inject constructor(
                 completedLessons = currentModuleProgress.completedLessons + 1
             )
             moduleProgressDao.insertOrUpdateProgress(updatedProgress)
+
+            checkForNewUnits(userId, mid)
         }
+    }
+
+    private suspend fun checkForNewUnits(userId: Long, moduleId: Long) {
+        val allUnits = unitDao.getAllUnits().firstOrNull() ?: return
+        val unitsForModule = allUnits.filter { it.moduleId == moduleId }
+        if (unitsForModule.isEmpty()) return
+
+        val existingUserUnits = unitDao.getAllUserUnits().firstOrNull() ?: emptyList()
+        val existingUnitIds = existingUserUnits.map { it.unitId }.toSet()
+
+        val newUnits = unitsForModule.filter { it.id !in existingUnitIds }
+        if (newUnits.isNotEmpty()) {
+            val userUnits = newUnits.map { unit ->
+                com.javadu.data.database.entities.UserUnit(
+                    unitId = unit.id,
+                    isHired = false,
+                    level = 1,
+                    currentHp = unit.baseHp
+                )
+            }
+            unitDao.insertUserUnits(userUnits)
+        }
+    }
+
+    suspend fun getNewlyAvailableUnits(moduleId: Long): List<Unit> {
+        val allUnits = unitDao.getAllUnits().firstOrNull() ?: return emptyList()
+        val existingUserUnits = unitDao.getAllUserUnits().firstOrNull() ?: return emptyList()
+        val existingUnitIds = existingUserUnits.map { it.unitId }.toSet()
+        return allUnits.filter { it.moduleId == moduleId && it.id !in existingUnitIds }
     }
 
     fun getUserProgress(userId: Long): Flow<List<UserProgress>> =

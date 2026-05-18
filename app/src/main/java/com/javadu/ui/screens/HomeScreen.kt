@@ -51,7 +51,8 @@ fun HomeScreen(
     viewModel: HomeViewModel,
     onNavigateToModule: (Long) -> Unit,
     onNavigateToProfile: () -> Unit,
-    onNavigateToShop: () -> Unit = {}
+    onNavigateToShop: () -> Unit = {},
+    onNavigateToBattle: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -72,6 +73,12 @@ fun HomeScreen(
                 },
                 actions = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
+                        IconButton(onClick = onNavigateToBattle) {
+                            Text(
+                                text = "⚔️",
+                                style = MaterialTheme.typography.titleLarge
+                            )
+                        }
                         // Coins display
                         Row(
                             verticalAlignment = Alignment.CenterVertically,

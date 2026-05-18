@@ -96,6 +96,7 @@ fun ShopScreen(
         ConfirmPurchaseDialog(
             item = selectedItem!!,
             userCoins = state.coins,
+            isOwned = selectedItem!!.unitId != null && state.ownedUnits.contains(selectedItem!!.unitId),
             onConfirm = {
                 viewModel.purchaseItem(selectedItem!!)
                 selectedItem = null
@@ -173,11 +174,13 @@ fun ShopScreen(
             }
 
             items(ShopItem.allItems) { item ->
-                val quantity = quantityMap[item.type] ?: 0
+                val quantity = if (item.bonusType != null) quantityMap[item.bonusType] ?: 0 else 0
+                val isOwned = item.unitId != null && state.ownedUnits.contains(item.unitId)
                 ShopItemCard(
                     item = item,
                     ownedQuantity = quantity,
-                    canAfford = state.coins >= item.price,
+                    isOwnedUnit = isOwned,
+                    canAfford = state.coins >= item.price && !isOwned,
                     onBuy = { selectedItem = item }
                 )
             }
@@ -189,13 +192,14 @@ fun ShopScreen(
 private fun ShopItemCard(
     item: ShopItem,
     ownedQuantity: Int,
+    isOwnedUnit: Boolean,
     canAfford: Boolean,
     onBuy: () -> Unit
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = if (isOwnedUnit) JavaGreen.copy(alpha = 0.2f) else MaterialTheme.colorScheme.surfaceVariant
         ),
         shape = RoundedCornerShape(16.dp)
     ) {
@@ -260,6 +264,23 @@ private fun ShopItemCard(
                         )
                     }
                 }
+                
+                if (isOwnedUnit) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.CheckCircle,
+                            contentDescription = null,
+                            tint = JavaGreen,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Text(
+                            text = "Куплено",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = JavaGreen,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -275,7 +296,11 @@ private fun ShopItemCard(
                 shape = RoundedCornerShape(12.dp)
             ) {
                 Text(
-                    text = if (canAfford) "Купить" else "Недостаточно Coins",
+                    text = when {
+                        isOwnedUnit -> "Куплено"
+                        canAfford -> "Купить"
+                        else -> "Недостаточно Coins"
+                    },
                     fontWeight = FontWeight.Bold,
                     color = DarkBackground
                 )
@@ -288,9 +313,12 @@ private fun ShopItemCard(
 private fun ConfirmPurchaseDialog(
     item: ShopItem,
     userCoins: Int,
+    isOwned: Boolean,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
+    if (isOwned) return
+    
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Купить ${item.name}?") },

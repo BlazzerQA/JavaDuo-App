@@ -8,6 +8,7 @@ import com.javadu.data.database.dao.LessonDao
 import com.javadu.data.database.dao.ModuleDao
 import com.javadu.data.database.dao.ModuleProgressDao
 import com.javadu.data.database.dao.QuestionDao
+import com.javadu.data.database.dao.UnitDao
 import com.javadu.data.database.dao.UserBonusDao
 import com.javadu.data.database.dao.UserDao
 import com.javadu.data.database.dao.UserProgressDao
@@ -57,4 +58,7 @@ object DatabaseModule {
 
     @Provides
     fun provideUserBonusDao(database: AppDatabase): UserBonusDao = database.userBonusDao()
+
+    @Provides
+    fun provideUnitDao(database: AppDatabase): UnitDao = database.unitDao()
 }
