@@ -57,9 +57,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Brush
-import com.javadu.data.database.entities.LevelInfo
+import androidx.compose.ui.graphics.Color
 import com.javadu.data.database.entities.LevelSystem
 import com.javadu.ui.components.QuestionCard
 import com.javadu.ui.theme.DarkBackground
@@ -232,21 +231,26 @@ fun LessonScreen(
                         )
 
                         AnimatedVisibility(
-                            visible = state.isAnswered,
-                            enter = fadeIn(tween(300)),
-                            exit = fadeOut(tween(300))
+                            visible = state.isAnswered && state.selectedAnswer != null && !state.isTransitioning,
+                            enter = fadeIn(tween(200)),
+                            exit = fadeOut(tween(200))
                         ) {
-                            val isCorrect = state.selectedAnswer == currentQuestion.correctAnswer
+                            val currentQ = state.questions.getOrNull(state.currentQuestionIndex)
+                            val isCorrect = currentQ?.let { state.selectedAnswer == it.correctAnswer } ?: false
                             ResultMessage(
                                 isCorrect = isCorrect,
-                                correctAnswer = currentQuestion.correctAnswer,
+                                correctAnswer = currentQ?.correctAnswer ?: "",
                                 insuranceUsed = state.bonuses.usedInsuranceThisQuestion && !isCorrect
                             )
                         }
 
                         Spacer(modifier = Modifier.weight(1f))
 
-                        if (state.isAnswered) {
+                        AnimatedVisibility(
+                            visible = state.isAnswered && !state.isTransitioning,
+                            enter = fadeIn(tween(200)),
+                            exit = fadeOut(tween(200))
+                        ) {
                             Button(
                                 onClick = { viewModel.nextQuestion() },
                                 modifier = Modifier
@@ -265,6 +269,8 @@ fun LessonScreen(
                                 )
                             }
                         }
+
+                        Spacer(modifier = Modifier.weight(1f))
                     }
                 }
             }
