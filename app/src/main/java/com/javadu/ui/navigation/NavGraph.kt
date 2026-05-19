@@ -125,6 +125,9 @@ fun NavGraph(
                 },
                 onNavigateToShop = {
                     navController.navigate(Screen.Shop.route)
+                },
+                onNavigateToSettings = {
+                    navController.navigate(Screen.Settings.route)
                 }
             )
         }

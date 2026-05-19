@@ -65,8 +65,9 @@ class MainActivity : ComponentActivity() {
 
                 val showBottomBar = currentRoute in listOf(
                     Screen.Home.route,
-                    Screen.Profile.route,
-                    Screen.Settings.route
+                    Screen.Battle.route,
+                    Screen.Shop.route,
+                    Screen.Profile.route
                 )
 
                 Scaffold(
@@ -75,20 +76,7 @@ class MainActivity : ComponentActivity() {
                         if (showBottomBar) {
                             BottomNavigationBar(
                                 currentRoute = currentRoute,
-                                onNavigate = { route ->
-                                    if (route == Screen.Home.route) {
-                                        // Для Home — делаем pop всего над Home, чтобы вернуться к корню
-                                        navController.popBackStack(Screen.Home.route, inclusive = false)
-                                    } else {
-                                        navController.navigate(route) {
-                                            popUpTo(Screen.Home.route) {
-                                                saveState = true
-                                            }
-                                            launchSingleTop = true
-                                            restoreState = true
-                                        }
-                                    }
-                                }
+                                navController = navController
                             )
                         }
                     }
@@ -129,23 +117,43 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun BottomNavigationBar(
     currentRoute: String?,
-    onNavigate: (String) -> Unit
+    navController: androidx.navigation.NavHostController
 ) {
-    val items = listOf(
-        BottomNavItem.Home,
-        BottomNavItem.Profile,
-        BottomNavItem.Settings
-    )
+    val items = BottomNavItem.items
 
     NavigationBar(
         containerColor = MaterialTheme.colorScheme.surface
     ) {
         items.forEach { item ->
             NavigationBarItem(
-                icon = { Icon(item.icon, contentDescription = item.title) },
+                icon = {
+                    if (item.icon != null) {
+                        Icon(item.icon, contentDescription = item.title)
+                    } else {
+                        Text(
+                            text = "⚔️",
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                    }
+                },
                 label = { Text(item.title) },
                 selected = currentRoute == item.route,
-                onClick = { onNavigate(item.route) }
+                onClick = {
+                    when (item.route) {
+                        Screen.Home.route -> {
+                            navController.popBackStack(Screen.Home.route, inclusive = false)
+                        }
+                        else -> {
+                            navController.navigate(item.route) {
+                                popUpTo(Screen.Home.route) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                        }
+                    }
+                }
             )
         }
     }
