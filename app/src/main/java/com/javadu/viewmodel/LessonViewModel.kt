@@ -46,7 +46,8 @@ class LessonViewModel @Inject constructor(
         val showTheory: Boolean = true,
         val bonuses: BonusesState = BonusesState(),
         val revealedHint: String? = null,
-        val userXpBeforeLesson: Int = 0
+        val userXpBeforeLesson: Int = 0,
+        val isTransitioning: Boolean = false
     )
 
     private val _state = MutableStateFlow(LessonState())
@@ -177,16 +178,21 @@ class LessonViewModel @Inject constructor(
                 )
             }
         } else {
-            _state.value = currentState.copy(
-                currentQuestionIndex = nextIndex,
-                selectedAnswer = null,
-                isAnswered = false,
-                revealedHint = null,
-                bonuses = currentState.bonuses.copy(
-                    usedHintThisQuestion = false,
-                    usedInsuranceThisQuestion = false
+            viewModelScope.launch {
+                _state.value = currentState.copy(isTransitioning = true)
+                kotlinx.coroutines.delay(200)
+                _state.value = currentState.copy(
+                    currentQuestionIndex = nextIndex,
+                    selectedAnswer = null,
+                    isAnswered = false,
+                    revealedHint = null,
+                    bonuses = currentState.bonuses.copy(
+                        usedHintThisQuestion = false,
+                        usedInsuranceThisQuestion = false
+                    ),
+                    isTransitioning = false
                 )
-            )
+            }
         }
     }
 
