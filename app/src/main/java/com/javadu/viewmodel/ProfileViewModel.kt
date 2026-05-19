@@ -1,12 +1,16 @@
 package com.javadu.viewmodel
 
+import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.javadu.data.database.entities.LevelInfo
 import com.javadu.data.database.entities.User
 import com.javadu.data.repository.LessonRepository
+import com.javadu.utils.AvatarManager
 import com.javadu.utils.SharedPrefs
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -15,8 +19,11 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val repository: LessonRepository,
-    private val sharedPrefs: SharedPrefs
+    private val sharedPrefs: SharedPrefs,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
+
+    private val avatarManager = AvatarManager(context)
 
     data class ProfileState(
         val user: User? = null,
@@ -68,11 +75,19 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    fun updateAvatarUri(avatarUri: String?) {
+    fun updateAvatarUri(uriString: String?) {
         viewModelScope.launch {
             val userId = state.value.user?.id ?: return@launch
-            repository.updateAvatarUri(userId, avatarUri)
-            if (!avatarUri.isNullOrBlank()) {
+            
+            uriString?.let { uriString ->
+                val uri = Uri.parse(uriString)
+                val savedPath = avatarManager.saveAvatar(uri)
+                repository.updateAvatarUri(userId, savedPath)
+            } ?: run {
+                repository.updateAvatarUri(userId, null)
+            }
+            
+            if (!uriString.isNullOrBlank()) {
                 repository.updateAvatarIcon(userId, null)
             }
             _state.value = _state.value.copy(showAvatarPicker = false)
