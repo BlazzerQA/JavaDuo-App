@@ -8,17 +8,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,10 +16,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.javadu.ui.navigation.BottomNavItem
+import com.javadu.ui.navigation.BottomNavigationBar
 import com.javadu.ui.navigation.NavGraph
 import com.javadu.ui.navigation.Screen
 import com.javadu.ui.theme.JavaDuoAppTheme
@@ -93,68 +82,23 @@ class MainActivity : ComponentActivity() {
                     )
                 }
             }
-        }
 
-        // Анимация выхода Splash Screen — slide up с ускорением
-        splashScreen.setOnExitAnimationListener { splashScreenView ->
-            val slideUp = ObjectAnimator.ofFloat(
-                splashScreenView.view,
-                View.TRANSLATION_Y,
-                0f,
-                -splashScreenView.view.height.toFloat()
-            )
+            // Анимация выхода Splash Screen — slide up с ускорением
+            splashScreen.setOnExitAnimationListener { splashScreenView ->
+                val slideUp = ObjectAnimator.ofFloat(
+                    splashScreenView.view,
+                    View.TRANSLATION_Y,
+                    0f,
+                    -splashScreenView.view.height.toFloat()
+                )
 
-            slideUp.apply {
-                interpolator = AnticipateInterpolator()
-                duration = 400L
-                doOnEnd { splashScreenView.remove() }
-                start()
-            }
-        }
-    }
-}
-
-@Composable
-private fun BottomNavigationBar(
-    currentRoute: String?,
-    navController: androidx.navigation.NavHostController
-) {
-    val items = BottomNavItem.items
-
-    NavigationBar(
-        containerColor = MaterialTheme.colorScheme.surface
-    ) {
-        items.forEach { item ->
-            NavigationBarItem(
-                icon = {
-                    if (item.icon != null) {
-                        Icon(item.icon, contentDescription = item.title)
-                    } else {
-                        Text(
-                            text = "⚔️",
-                            style = MaterialTheme.typography.titleLarge
-                        )
-                    }
-                },
-                label = { Text(item.title) },
-                selected = currentRoute == item.route,
-                onClick = {
-                    when (item.route) {
-                        Screen.Home.route -> {
-                            navController.popBackStack(Screen.Home.route, inclusive = false)
-                        }
-                        else -> {
-                            navController.navigate(item.route) {
-                                popUpTo(Screen.Home.route) {
-                                    saveState = true
-                                }
-                                launchSingleTop = true
-                                restoreState = true
-                            }
-                        }
-                    }
+                slideUp.apply {
+                    interpolator = AnticipateInterpolator()
+                    duration = 400L
+                    doOnEnd { splashScreenView.remove() }
+                    start()
                 }
-            )
+            }
         }
     }
 }
