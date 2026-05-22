@@ -121,10 +121,15 @@ fun NavGraph(
             ProfileScreen(
                 viewModel = viewModel,
                 onNavigateBack = {
-                    navController.popBackStack()
+                    if (navController.currentDestination?.route != Screen.Home.route) {
+                        navController.popBackStack(Screen.Home.route, inclusive = false)
+                    }
                 },
                 onNavigateToShop = {
                     navController.navigate(Screen.Shop.route)
+                },
+                onNavigateToSettings = {
+                    navController.navigate(Screen.Settings.route)
                 }
             )
         }
@@ -134,7 +139,9 @@ fun NavGraph(
             ShopScreen(
                 viewModel = viewModel,
                 onNavigateBack = {
-                    navController.popBackStack()
+                    if (navController.currentDestination?.route != Screen.Home.route) {
+                        navController.popBackStack(Screen.Home.route, inclusive = false)
+                    }
                 }
             )
         }
@@ -161,7 +168,9 @@ fun NavGraph(
             BattleScreen(
                 viewModel = viewModel,
                 onNavigateBack = {
-                    navController.popBackStack()
+                    if (navController.currentDestination?.route != Screen.Home.route) {
+                        navController.popBackStack(Screen.Home.route, inclusive = false)
+                    }
                 }
             )
         }

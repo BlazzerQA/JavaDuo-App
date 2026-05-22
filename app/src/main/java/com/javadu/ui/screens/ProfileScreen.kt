@@ -46,6 +46,7 @@ import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material.icons.filled.Rocket
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.SentimentSatisfied
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SportsEsports
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.WbSunny
@@ -96,7 +97,8 @@ import com.javadu.viewmodel.ProfileViewModel
 fun ProfileScreen(
     viewModel: ProfileViewModel,
     onNavigateBack: () -> Unit,
-    onNavigateToShop: () -> Unit = {}
+    onNavigateToShop: () -> Unit = {},
+    onNavigateToSettings: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsState()
     var showResetDialog by remember { mutableStateOf(false) }
@@ -153,6 +155,14 @@ fun ProfileScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Назад"
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(onClick = onNavigateToSettings) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = "Настройки"
                         )
                     }
                 },

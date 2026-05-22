@@ -73,12 +73,6 @@ fun HomeScreen(
                 },
                 actions = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        IconButton(onClick = onNavigateToBattle) {
-                            Text(
-                                text = "⚔️",
-                                style = MaterialTheme.typography.titleLarge
-                            )
-                        }
                         // Coins display
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -95,20 +89,6 @@ fun HomeScreen(
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = JavaGreen
-                            )
-                        }
-                        IconButton(onClick = onNavigateToShop) {
-                            Icon(
-                                imageVector = Icons.Default.ShoppingCart,
-                                contentDescription = "Магазин",
-                                tint = JavaGreen
-                            )
-                        }
-                        IconButton(onClick = onNavigateToProfile) {
-                            Icon(
-                                imageVector = Icons.Default.Person,
-                                contentDescription = "Профиль",
-                                tint = JavaGreen
                             )
                         }
                     }

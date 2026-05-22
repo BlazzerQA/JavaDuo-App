@@ -6,30 +6,32 @@ import android.view.View
 import android.view.animation.AnticipateInterpolator
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.javadu.ui.navigation.BottomNavItem
+import com.javadu.ui.navigation.BottomNavigationBar
+import com.javadu.ui.navigation.GameNavigationBar
 import com.javadu.ui.navigation.NavGraph
 import com.javadu.ui.navigation.Screen
 import com.javadu.ui.theme.JavaDuoAppTheme
@@ -65,36 +67,25 @@ class MainActivity : ComponentActivity() {
 
                 val showBottomBar = currentRoute in listOf(
                     Screen.Home.route,
-                    Screen.Profile.route,
-                    Screen.Settings.route
+                    Screen.Battle.route,
+                    Screen.Shop.route,
+                    Screen.Profile.route
                 )
 
-                Scaffold(
-                    modifier = Modifier.fillMaxSize(),
-                    bottomBar = {
-                        if (showBottomBar) {
-                            BottomNavigationBar(
-                                currentRoute = currentRoute,
-                                onNavigate = { route ->
-                                    if (route == Screen.Home.route) {
-                                        // Для Home — делаем pop всего над Home, чтобы вернуться к корню
-                                        navController.popBackStack(Screen.Home.route, inclusive = false)
-                                    } else {
-                                        navController.navigate(route) {
-                                            popUpTo(Screen.Home.route) {
-                                                saveState = true
-                                            }
-                                            launchSingleTop = true
-                                            restoreState = true
-                                        }
-                                    }
-                                }
-                            )
-                        }
-                    }
-                ) { innerPadding ->
+                val useGameNav = true
+
+                val animatedBottomPadding by animateDpAsState(
+                    targetValue = if (showBottomBar) 76.dp else 0.dp,
+                    animationSpec = tween(durationMillis = 300),
+                    label = "bottomPadding"
+                )
+
+                Box(modifier = Modifier.fillMaxSize()) {
                     NavGraph(
-                        modifier = Modifier.padding(innerPadding),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.Transparent)
+                            .padding(bottom = animatedBottomPadding),
                         navController = navController,
                         startDestination = startDestination,
                         isDarkTheme = isDarkTheme,
@@ -103,50 +94,56 @@ class MainActivity : ComponentActivity() {
                             sharedPrefs.isDarkTheme = isDark
                         }
                     )
+
+                    AnimatedVisibility(
+                        visible = showBottomBar,
+                        enter = slideInVertically(
+                            initialOffsetY = { it },
+                            animationSpec = tween(durationMillis = 300)
+                        ) + fadeIn(),
+                        exit = slideOutVertically(
+                            targetOffsetY = { it },
+                            animationSpec = tween(durationMillis = 300)
+                        ) + fadeOut(),
+                        modifier = Modifier.align(Alignment.BottomCenter)
+
+                    ) {
+                        Box(modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.BottomCenter)
+                            .background(Color.Transparent)
+                        ) {
+                            when {
+                                useGameNav -> GameNavigationBar(
+                                    currentRoute = currentRoute,
+                                    navController = navController
+                                )
+                                else -> BottomNavigationBar(
+                                    currentRoute = currentRoute,
+                                    navController = navController
+                                )
+                            }
+                        }
+                    }
                 }
             }
-        }
 
-        // Анимация выхода Splash Screen — slide up с ускорением
-        splashScreen.setOnExitAnimationListener { splashScreenView ->
-            val slideUp = ObjectAnimator.ofFloat(
-                splashScreenView.view,
-                View.TRANSLATION_Y,
-                0f,
-                -splashScreenView.view.height.toFloat()
-            )
+            // Анимация выхода Splash Screen — slide up с ускорением
+            splashScreen.setOnExitAnimationListener { splashScreenView ->
+                val slideUp = ObjectAnimator.ofFloat(
+                    splashScreenView.view,
+                    View.TRANSLATION_Y,
+                    0f,
+                    -splashScreenView.view.height.toFloat()
+                )
 
-            slideUp.apply {
-                interpolator = AnticipateInterpolator()
-                duration = 400L
-                doOnEnd { splashScreenView.remove() }
-                start()
+                slideUp.apply {
+                    interpolator = AnticipateInterpolator()
+                    duration = 400L
+                    doOnEnd { splashScreenView.remove() }
+                    start()
+                }
             }
-        }
-    }
-}
-
-@Composable
-private fun BottomNavigationBar(
-    currentRoute: String?,
-    onNavigate: (String) -> Unit
-) {
-    val items = listOf(
-        BottomNavItem.Home,
-        BottomNavItem.Profile,
-        BottomNavItem.Settings
-    )
-
-    NavigationBar(
-        containerColor = MaterialTheme.colorScheme.surface
-    ) {
-        items.forEach { item ->
-            NavigationBarItem(
-                icon = { Icon(item.icon, contentDescription = item.title) },
-                label = { Text(item.title) },
-                selected = currentRoute == item.route,
-                onClick = { onNavigate(item.route) }
-            )
         }
     }
 }
