@@ -72,20 +72,16 @@ class MainActivity : ComponentActivity() {
                     Screen.Profile.route
                 )
 
-                val useGameNav = true
+                val useGameNav = true // флаг использования игрового навбара
 
-                val animatedBottomPadding by animateDpAsState(
-                    targetValue = if (showBottomBar) 76.dp else 0.dp,
-                    animationSpec = tween(durationMillis = 300),
-                    label = "bottomPadding"
-                )
+                val bottomPadding = if (showBottomBar) 76.dp else 0.dp
 
                 Box(modifier = Modifier.fillMaxSize()) {
                     NavGraph(
                         modifier = Modifier
                             .fillMaxSize()
                             .background(Color.Transparent)
-                            .padding(bottom = animatedBottomPadding),
+                            .padding(bottom = bottomPadding),
                         navController = navController,
                         startDestination = startDestination,
                         isDarkTheme = isDarkTheme,
@@ -95,28 +91,17 @@ class MainActivity : ComponentActivity() {
                         }
                     )
 
-                    AnimatedVisibility(
-                        visible = showBottomBar,
-                        enter = slideInVertically(
-                            initialOffsetY = { it },
-                            animationSpec = tween(durationMillis = 300)
-                        ) + fadeIn(),
-                        exit = slideOutVertically(
-                            targetOffsetY = { it },
-                            animationSpec = tween(durationMillis = 300)
-                        ) + fadeOut(),
-                        modifier = Modifier.align(Alignment.BottomCenter)
-
-                    ) {
-                        Box(modifier = Modifier
-                            .fillMaxWidth()
-                            .align(Alignment.BottomCenter)
-                            .background(Color.Transparent)
+                    if (showBottomBar) {
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.BottomCenter)
+                                .background(Color.Transparent)
                         ) {
                             when {
                                 useGameNav -> GameNavigationBar(
                                     currentRoute = currentRoute,
                                     navController = navController
+
                                 )
                                 else -> BottomNavigationBar(
                                     currentRoute = currentRoute,
