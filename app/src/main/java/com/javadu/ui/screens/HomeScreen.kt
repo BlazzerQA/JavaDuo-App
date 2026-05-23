@@ -15,9 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -28,8 +26,6 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -39,9 +35,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.javadu.data.database.entities.LevelSystem
+import com.javadu.ui.components.CustomTopBar
 import com.javadu.ui.components.KnowledgeGraph
 import com.javadu.ui.components.RandomQuestionCard
-import com.javadu.ui.theme.DarkBackground
 import com.javadu.ui.theme.JavaGreen
 import com.javadu.viewmodel.HomeViewModel
 
@@ -63,40 +60,14 @@ fun HomeScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "JavaDuo",
-                        color = JavaGreen,
-                        fontWeight = FontWeight.Bold
-                    )
-                },
-                actions = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        // Coins display
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(4.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.AccountBalanceWallet,
-                                contentDescription = null,
-                                tint = JavaGreen,
-                                modifier = Modifier.size(20.dp)
-                            )
-                            Text(
-                                text = "${state.user?.coins ?: 0}",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = JavaGreen
-                            )
-                        }
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = DarkBackground
+            state.user?.let { user ->
+                val levelInfo = LevelSystem.getLevelInfo(user.totalXp)
+                CustomTopBar(
+                    user = user,
+                    currentXp = levelInfo.currentXp,
+                    nextLevelXp = levelInfo.nextLevelXp
                 )
-            )
+            }
         }
     ) { paddingValues ->
         if (state.isLoading) {
