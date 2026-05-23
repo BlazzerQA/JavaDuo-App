@@ -1,5 +1,6 @@
 package com.javadu.ui.components
 
+import android.R.attr.letterSpacing
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
@@ -42,6 +43,13 @@ fun PlayerProfileCard(
     val statsBackgroundBrush = Brush.horizontalGradient(
         colors = listOf(Color(0xFA0E1116), Color(0xC0141922), Color(0x00141922))
     )
+    val nickGradient = Brush.verticalGradient(
+        colors = listOf(
+            Color(0xFFFFFFFF), // Чистый белый глянец сверху
+            Color(0xFFDEE4EC), // Мягкий серебряный оттенок в центре
+            Color(0xFFB0B9C6)  // Плотный стальной цвет снизу букв
+        )
+    )
 
     val progress = if (nextLevelXp > 0) (currentXp.toFloat() / nextLevelXp).coerceIn(0f, 1f) else 0f
     val level = user?.let { (it.totalXp / 100) + 1 } ?: 12
@@ -77,7 +85,7 @@ fun PlayerProfileCard(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
+                    .weight(0.9f)
                     .clip(leftRoundedShape)
                     .background(brush = darkNickBackgroundBrush)
                     .padding(start = textStartPadding, top = 2.dp), // Градиент идет под аватаром, текст отодвинут
@@ -85,9 +93,9 @@ fun PlayerProfileCard(
             ) {
                 Text(
                     text = user?.name ?: "QA Warrior",
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color(0xFFE2E8F0),
                 )
             }
 
@@ -95,7 +103,7 @@ fun PlayerProfileCard(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1.3f)
+                    .weight(1.5f)
                     .clip(leftRoundedShape)
                     .background(brush = statsBackgroundBrush)
                     .padding(start = textStartPadding, bottom = 2.dp) // Отодвигаем весь внутренний Column
@@ -109,22 +117,49 @@ fun PlayerProfileCard(
                         fontSize = 11.sp,
                         color = goldColor
                     )
-                    Spacer(modifier = Modifier.height(1.dp))
-                    LinearProgressIndicator(
-                        progress = { progress },
+
+                    Row(
                         modifier = Modifier
-                            .width(130.dp)
-                            .height(4.dp)
-                            .clip(RoundedCornerShape(2.dp)),
-                        color = goldColor,
-                        trackColor = Color.White.copy(alpha = 0.1f)
-                    )
-                    Spacer(modifier = Modifier.height(1.dp))
-                    Text(
-                        text = "$currentXp / $nextLevelXp XP",
-                        fontSize = 9.sp,
-                        color = Color.White.copy(alpha = 0.6f)
-                    )
+                            .width(130.dp), // <-- Ограничиваем общую ширину всей этой строки, чтобы она не была слишком длинной
+                        verticalAlignment = Alignment.CenterVertically, // Выравниваем полоску и текст строго по центру друг друга
+                        horizontalArrangement = Arrangement.spacedBy(6.dp) // Зазор между полоской и текстом XP
+                    ) {
+                        // Прогресс бар кастомный
+                        Box(
+                            modifier = Modifier
+                                .weight(1f) // Занимает всё свободное место в Row до цифр XP
+                                .height(6.dp) // Толщина шкалы
+                                .clip(RoundedCornerShape(3.dp)) // Скругляем края всей шкалы
+                                .background(Color(0xFF13100B)) // Глубокий темный цвет подложки (не просвечивает)
+                        ) {
+                            // Красивый градиент для заполненной части (от золотого к ярко-желтому)
+                            val progressGradient = Brush.horizontalGradient(
+                                colors = listOf(
+                                    Color(0xFFD99628), // Темное золото на старте (слева)
+                                    Color(0xFFFFD700), // Яркое чистое золото в процессе
+                                    Color(0xFFFFF099)  // Свечение на самом кончике прогресса (справа)
+                                )
+                            )
+
+                            // Заполненная часть шкалы
+                            if (progress > 0f) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxHeight() // Заполняет всю высоту трека (6.dp)
+                                        .fillMaxWidth(progress) // <--- МАГИЯ ТУТ: заполняет ширину ровно на процент от 0.0f до 1.0f
+                                        .background(brush = progressGradient)
+                                )
+                            }
+                        }
+
+                        Text(
+                            text = "$currentXp / $nextLevelXp XP",
+                            fontSize = 10.sp,
+                            lineHeight = 10.sp,
+                            color = Color.White.copy(alpha = 0.6f),
+                            modifier = Modifier.wrapContentWidth()
+                        )
+                    }
                 }
             }
         }
@@ -166,11 +201,11 @@ fun PlayerProfileCard(
             Box(
                 modifier = Modifier
                     .align(Alignment.CenterStart)
-                    .offset(x = (-6).dp)
+                    .offset(x = (-3).dp, y = 26.dp)
                     .size(22.dp)
                     .clip(AbsoluteCutCornerShape(4.dp))
                     .background(Color(0xFF0A0D12))
-                    .border(1.dp, goldColor, AbsoluteCutCornerShape(4.dp)),
+                    .border(1.dp, darkGoldBorder, AbsoluteCutCornerShape(4.dp)),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
