@@ -1,43 +1,27 @@
 package com.javadu.ui.screens
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.unit.dp
 import com.javadu.R
+import com.javadu.data.database.entities.BuildingUi
 import com.javadu.data.database.entities.LevelSystem
+import com.javadu.ui.components.AnimatedBackground
+import com.javadu.ui.components.BuildingClickableZone
 import com.javadu.ui.components.CustomTopBar
-import com.javadu.ui.components.KnowledgeGraph
-import com.javadu.ui.components.RandomQuestionCard
 import com.javadu.ui.theme.JavaGreen
 import com.javadu.viewmodel.HomeViewModel
 
@@ -57,30 +41,20 @@ fun HomeScreen(
         viewModel.loadRandomQuestion()
     }
 
-    Scaffold(
-        topBar = {
-            state.user?.let { user ->
-                val levelInfo = LevelSystem.getLevelInfo(user.totalXp)
-                CustomTopBar(
-                    user = user,
-                    currentXp = levelInfo.currentXp,
-                    nextLevelXp = levelInfo.nextLevelXp
-                )
-            }
-        },
-        containerColor = Color.Transparent
-    ) { paddingValues ->
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            // ФОНОВОЕ ИЗОБРАЖЕНИЕ на весь экран
-            Image(
-                painter = painterResource(R.drawable.bg_home),
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.FillBounds
-            )
-
+    AnimatedBackground(videoResId = R.raw.bg_game_video) {
+        Scaffold(
+            topBar = {
+                state.user?.let { user ->
+                    val levelInfo = LevelSystem.getLevelInfo(user.totalXp)
+                    CustomTopBar(
+                        user = user,
+                        currentXp = levelInfo.currentXp,
+                        nextLevelXp = levelInfo.nextLevelXp
+                    )
+                }
+            },
+            containerColor = Color.Transparent
+        ) { paddingValues ->
             if (state.isLoading) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
@@ -89,115 +63,86 @@ fun HomeScreen(
                     CircularProgressIndicator(color = JavaGreen)
                 }
             } else {
-                LazyColumn(
+                Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(paddingValues),
-                    contentPadding = PaddingValues(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                        .padding(paddingValues)
                 ) {
-                    // Приветствие
-                    item {
-                        val userName = state.user?.name ?: "Друг"
-                        Text(
-                            text = "Привет, $userName! ✨",
-                            style = MaterialTheme.typography.displaySmall,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onBackground
+                    val buildings = listOf(
+                        BuildingUi(
+                            title = "Таверна",
+                            pctX = 0.7f,
+                            pctY = 0.43f,
+                            isLocked = true,
+                            onClick = { }
+                        ),
+                        BuildingUi(
+                            title = "Арена",
+                            pctX = 2.1f,
+                            pctY = 0.43f,
+                            onClick = onNavigateToBattle
+                        ),
+                        BuildingUi(
+                            title = "Библиотека",
+                            pctX = 0.45f,
+                            pctY = 0.64f,
+                            onClick = { onNavigateToModule(1) }
+                        ),
+                        BuildingUi(
+                            title = "Рынок",
+                            pctX = 1.2f,
+                            pctY = 0.65f,
+                            onClick = onNavigateToShop
+                        ),
+                        BuildingUi(
+                            title = "Казарма",
+                            pctX = 2.23f,
+                            pctY = 0.66f,
+                            onClick = onNavigateToProfile
+                        ),
+                        BuildingUi(
+                            title = "Подземелье",
+                            pctX = 0.43f,
+                            pctY = 0.21f,
+                            isLocked = true,
+                            onClick = { }
+                        ),
+                        BuildingUi(
+                            title = "Цитадель",
+                            pctX = 1.4f,
+                            pctY = 0.15f,
+                            isLocked = true,
+                            onClick = { }
+                        ),
+                        BuildingUi(
+                            title = "Логово",
+                            pctX = 2.3f,
+                            pctY = 0.15f,
+                            isLocked = true,
+                            onClick = { }
                         )
-                    }
+                    )
 
-                    // Прогресс за сегодня
-                    item {
-                        Card(
-                            modifier = Modifier.fillMaxWidth(),
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceVariant
-                            ),
-                            shape = RoundedCornerShape(16.dp)
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(16.dp)
-                            ) {
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Text(
-                                        text = "Прогресс сегодня",
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.onSurface
-                                    )
-                                    Text(
-                                        text = "${state.todayXp} / ${state.dailyGoal} XP",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.primary,
-                                        fontWeight = FontWeight.Bold
-                                    )
+                    buildings.forEach { building ->
+                        BuildingClickableZone(
+                            building = building,
+                            modifier = Modifier
+                                .widthIn(max = 145.dp)
+                                .layout { measurable, constraints ->
+                                    val placeable = measurable.measure(constraints)
+
+                                    // Рассчитываем точные координаты на этапе измерения экрана
+                                    val centerX = (constraints.maxWidth * building.pctX).toInt()
+                                    val centerY  = (constraints.maxHeight * building.pctY).toInt()
+
+                                    val xPosition = centerX - (placeable.width / 2)
+                                    val yPosition = centerY - (placeable.height / 2)
+
+                                    layout(placeable.width, placeable.height) {
+                                        placeable.placeRelative(xPosition, yPosition)
+                                    }
                                 }
-                                Spacer(modifier = Modifier.height(12.dp))
-                                LinearProgressIndicator(
-                                    progress = {
-                                        (state.todayXp.toFloat() / state.dailyGoal).coerceIn(
-                                            0f,
-                                            1f
-                                        )
-                                    },
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(8.dp)
-                                        .clip(RoundedCornerShape(4.dp)),
-                                    color = JavaGreen,
-                                    trackColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)
-                                )
-                            }
-                        }
-                    }
-
-                    // Заголовок случайного вопроса
-                    item {
-                        Text(
-                            text = "\uD83C\uDFAF Случайный вопрос из собеседований",
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onBackground,
-                            modifier = Modifier.padding(top = 8.dp)
                         )
-                    }
-
-                    // Карточка случайного вопроса
-                    item {
-                        RandomQuestionCard(
-                            question = state.randomQuestion,
-                            onNextQuestion = { viewModel.loadRandomQuestion() }
-                        )
-                    }
-
-                    // Граф знаний
-                    item {
-                        Text(
-                            text = "\u2728 Карта знаний",
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onBackground,
-                            modifier = Modifier.padding(top = 8.dp)
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        val totalLessonsMap = state.modules.associate { it.id to it.totalLessons }
-
-                        KnowledgeGraph(
-                            modifier = Modifier.fillMaxWidth(),
-                            progressMap = state.moduleProgress,
-                            totalLessonsMap = totalLessonsMap,
-                            onNodeClick = onNavigateToModule
-                        )
-                    }
-
-                    item {
-                        Spacer(modifier = Modifier.height(16.dp))
                     }
                 }
             }
