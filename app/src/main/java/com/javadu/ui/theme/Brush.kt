@@ -18,3 +18,12 @@ val ProgressGradient = Brush.horizontalGradient(
         Color(0xFFFFF099)
     )
 )
+
+val TextFadeBrush = Brush.horizontalGradient(
+    colors = listOf(
+        Color.Transparent,
+        Color.Black.copy(alpha = 0.7f),
+        Color.Black.copy(alpha = 0.7f),
+        Color.Transparent
+    )
+)

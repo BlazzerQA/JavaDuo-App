@@ -13,8 +13,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import com.javadu.ui.theme.TextFadeBrush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -46,21 +46,9 @@ fun BuildingClickableZone(
                     building.onClick()
                 }
         )
-
-        // 2. Полупрозрачный бокс для текста с фейдом по бокам
-        // Используем горизонтальный градиент: Прозрачный -> Черный(0.7) -> Черный(0.7) -> Прозрачный
-        val fadeBrush = Brush.horizontalGradient(
-            colors = listOf(
-                Color.Transparent,
-                Color.Black.copy(alpha = 0.7f),
-                Color.Black.copy(alpha = 0.7f),
-                Color.Transparent
-            )
-        )
-
         Box(
             modifier = Modifier
-                .background(brush = fadeBrush)
+                .background(brush = TextFadeBrush)
                 .padding(horizontal = 24.dp, vertical = 0.dp),
             contentAlignment = Alignment.Center
         ) {
