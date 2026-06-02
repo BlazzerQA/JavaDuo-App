@@ -94,6 +94,19 @@ class LessonRepository @Inject constructor(
         return userDao.getUserById(userId)?.coins ?: 0
     }
 
+    suspend fun addDiamonds(userId: Long, diamonds: Int) {
+        userDao.addDiamonds(userId, diamonds)
+    }
+
+    suspend fun spendDiamonds(userId: Long, diamonds: Int): Boolean {
+        val affected = userDao.spendDiamonds(userId, diamonds)
+        return affected > 0
+    }
+
+    suspend fun getUserDiamonds(userId: Long): Int {
+        return userDao.getUserById(userId)?.diamonds ?: 0
+    }
+
     suspend fun completeLesson(userId: Long, lessonId: Long, xpEarned: Int, moduleId: Long?) {
         val progress = UserProgress(
             userId = userId,
