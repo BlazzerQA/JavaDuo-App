@@ -73,6 +73,9 @@ fun NavGraph(
                 },
                 onNavigateToBattle = {
                     navController.navigate(Screen.Battle.route)
+                },
+                onNavigateToSettings = {
+                    navController.navigate(Screen.Settings.route)
                 }
             )
         }
