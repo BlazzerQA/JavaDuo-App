@@ -19,6 +19,14 @@ val ProgressGradient = Brush.horizontalGradient(
     )
 )
 
+val DiamondsGradient = Brush.horizontalGradient(
+    colors = listOf(
+        Color(0xFF667EEA),
+        Color(0xFF764BA2),
+        Color(0xFF6C5CE7)
+    )
+)
+
 val TextFadeBrush = Brush.horizontalGradient(
     colors = listOf(
         Color.Transparent,

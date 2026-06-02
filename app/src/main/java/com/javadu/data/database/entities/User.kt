@@ -11,6 +11,7 @@ data class User(
     val email: String? = null,
     val totalXp: Int = 0,
     val coins: Int = 0,
+    val diamonds: Int = 0,
     val currentStreak: Int = 0,
     val isGuest: Boolean = false,
     val avatarUri: String? = null,

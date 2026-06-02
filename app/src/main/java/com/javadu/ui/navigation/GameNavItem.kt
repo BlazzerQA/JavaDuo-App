@@ -1,6 +1,5 @@
 package com.javadu.ui.navigation
 
-import androidx.compose.ui.graphics.vector.ImageVector
 import com.javadu.R
 
 sealed class GameNavItem(

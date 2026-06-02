@@ -25,7 +25,7 @@ import com.javadu.data.database.entities.BuildingUi
 import com.javadu.data.database.entities.LevelSystem
 import com.javadu.ui.components.AnimatedBackground
 import com.javadu.ui.components.BuildingClickableZone
-import com.javadu.ui.components.CustomTopBar
+import com.javadu.ui.components.topbar.CustomTopBar
 import com.javadu.ui.theme.JavaGreen
 import com.javadu.utils.calculateViewport
 import com.javadu.viewmodel.HomeViewModel
@@ -38,7 +38,8 @@ fun HomeScreen(
     onNavigateToModule: (Long) -> Unit,
     onNavigateToProfile: () -> Unit,
     onNavigateToShop: () -> Unit = {},
-    onNavigateToBattle: () -> Unit = {}
+    onNavigateToBattle: () -> Unit = {},
+    onNavigateToSettings: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -55,7 +56,8 @@ fun HomeScreen(
                     CustomTopBar(
                         user = user,
                         currentXp = levelInfo.currentXp,
-                        nextLevelXp = levelInfo.nextLevelXp
+                        nextLevelXp = levelInfo.nextLevelXp,
+                        onNavigateToSettings = onNavigateToSettings
                     )
                 }
             },

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -15,7 +16,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -41,15 +41,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.javadu.data.database.entities.BonusType
 import com.javadu.data.database.entities.ShopItem
-import com.javadu.data.database.entities.UserBonus
 import com.javadu.ui.theme.DarkBackground
-import com.javadu.ui.theme.ErrorRed
 import com.javadu.ui.theme.JavaGreen
 import com.javadu.viewmodel.ShopViewModel
+import com.javadu.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -122,20 +121,40 @@ fun ShopScreen(
                 actions = {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.AccountBalanceWallet,
-                            contentDescription = null,
-                            tint = JavaGreen,
-                            modifier = Modifier.size(20.dp)
-                        )
-                        Text(
-                            text = "${state.coins}",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = JavaGreen
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Image(
+                                painter = painterResource(R.drawable.top_ic_coin),
+                                contentDescription = "Монеты",
+                                modifier = Modifier.size(22.dp)
+                            )
+                            Text(
+                                text = "${state.coins}",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+                            Image(
+                                painter = painterResource(R.drawable.top_ic_diamond),
+                                contentDescription = "Алмазы",
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Text(
+                                text = "${state.diamonds}",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -235,14 +254,13 @@ private fun ShopItemCard(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = Icons.Default.AccountBalanceWallet,
-                        contentDescription = null,
-                        tint = JavaGreen,
-                        modifier = Modifier.size(16.dp)
+                    Image(
+                        painter = painterResource(R.drawable.top_ic_coin),
+                        contentDescription = "Монеты",
+                        modifier = Modifier.size(18.dp)
                     )
                     Text(
-                        text = "${item.price} Coins",
+                        text = "${item.price}",
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold,
                         color = JavaGreen

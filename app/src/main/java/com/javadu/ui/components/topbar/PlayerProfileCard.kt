@@ -1,4 +1,4 @@
-package com.javadu.ui.components
+package com.javadu.ui.components.topbar
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
