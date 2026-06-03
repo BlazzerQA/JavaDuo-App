@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -36,7 +35,6 @@ import androidx.compose.material.icons.filled.Bed
 import androidx.compose.material.icons.filled.Brightness3
 import androidx.compose.material.icons.filled.Brightness5
 import androidx.compose.material.icons.filled.Brightness6
-import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.ShoppingCart
@@ -47,7 +45,6 @@ import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material.icons.filled.Rocket
 import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.SentimentSatisfied
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SportsEsports
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.WbSunny
@@ -100,8 +97,7 @@ import com.javadu.viewmodel.ProfileViewModel
 fun ProfileScreen(
     viewModel: ProfileViewModel,
     onNavigateBack: () -> Unit,
-    onNavigateToShop: () -> Unit = {},
-    onNavigateToSettings: () -> Unit = {}
+    onNavigateToShop: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsState()
     var showResetDialog by remember { mutableStateOf(false) }
@@ -158,14 +154,6 @@ fun ProfileScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Назад"
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(onClick = onNavigateToSettings) {
-                        Icon(
-                            imageVector = Icons.Default.Settings,
-                            contentDescription = "Настройки"
                         )
                     }
                 },
