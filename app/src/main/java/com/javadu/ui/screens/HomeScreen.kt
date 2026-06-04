@@ -14,7 +14,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,16 +27,19 @@ import com.javadu.data.database.entities.BuildingUi
 import com.javadu.data.database.entities.LevelSystem
 import com.javadu.ui.components.AnimatedBackground
 import com.javadu.ui.components.BuildingClickableZone
+import com.javadu.ui.components.settings.SettingsDialog
 import com.javadu.ui.components.topbar.CustomTopBar
 import com.javadu.ui.theme.JavaGreen
 import com.javadu.utils.calculateViewport
 import com.javadu.viewmodel.HomeViewModel
+import com.javadu.viewmodel.SettingsViewModel
 
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
+    settingsViewModel: SettingsViewModel,
     onNavigateToModule: (Long) -> Unit,
     onNavigateToProfile: () -> Unit,
     onNavigateToShop: () -> Unit = {},
@@ -42,10 +47,19 @@ fun HomeScreen(
     onNavigateToSettings: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsState()
+    var showSettingsDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         viewModel.refreshTodayXp()
         viewModel.loadRandomQuestion()
+    }
+
+    if (showSettingsDialog) {
+        SettingsDialog(
+            viewModel = settingsViewModel,
+            onDismiss = { showSettingsDialog = false },
+            onNavigateToLogin = onNavigateToSettings
+        )
     }
 
     AnimatedBackground(videoResId = R.raw.bg_game_video) {
@@ -57,7 +71,7 @@ fun HomeScreen(
                         user = user,
                         currentXp = levelInfo.currentXp,
                         nextLevelXp = levelInfo.nextLevelXp,
-                        onNavigateToSettings = onNavigateToSettings
+                        onNavigateToSettings = { showSettingsDialog = true }
                     )
                 }
             },

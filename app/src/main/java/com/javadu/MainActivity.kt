@@ -6,33 +6,22 @@ import android.view.View
 import android.view.animation.AnticipateInterpolator
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.javadu.ui.navigation.NavGraph
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.javadu.ui.navigation.BottomNavigationBar
 import com.javadu.ui.navigation.GameNavigationBar
-import com.javadu.ui.navigation.NavGraph
 import com.javadu.ui.navigation.Screen
 import com.javadu.ui.theme.JavaDuoAppTheme
 import com.javadu.utils.SharedPrefs
@@ -58,9 +47,7 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            var isDarkTheme by remember { mutableStateOf(sharedPrefs.isDarkTheme) }
-
-            JavaDuoAppTheme(darkTheme = isDarkTheme) {
+            JavaDuoAppTheme {
                 val navController = rememberNavController()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
@@ -83,12 +70,7 @@ class MainActivity : ComponentActivity() {
                             .background(Color.Transparent)
                             .padding(bottom = bottomPadding),
                         navController = navController,
-                        startDestination = startDestination,
-                        isDarkTheme = isDarkTheme,
-                        onThemeChange = { isDark ->
-                            isDarkTheme = isDark
-                            sharedPrefs.isDarkTheme = isDark
-                        }
+                        startDestination = startDestination
                     )
 
                     if (showBottomBar) {

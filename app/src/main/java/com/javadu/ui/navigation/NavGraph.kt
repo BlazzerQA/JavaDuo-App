@@ -15,7 +15,6 @@ import com.javadu.ui.screens.LoginScreen
 import com.javadu.ui.screens.ModuleLessonsScreen
 import com.javadu.ui.screens.OnboardingScreen
 import com.javadu.ui.screens.ProfileScreen
-import com.javadu.ui.screens.SettingsScreen
 import com.javadu.ui.screens.ShopScreen
 import com.javadu.viewmodel.BattleViewModel
 import com.javadu.viewmodel.HomeViewModel
@@ -29,9 +28,7 @@ import com.javadu.viewmodel.ShopViewModel
 fun NavGraph(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    startDestination: String,
-    isDarkTheme: Boolean,
-    onThemeChange: (Boolean) -> Unit
+    startDestination: String
 ) {
     NavHost(
         modifier = modifier,
@@ -60,8 +57,10 @@ fun NavGraph(
 
         composable(Screen.Home.route) {
             val viewModel: HomeViewModel = hiltViewModel()
+            val settingsViewModel: SettingsViewModel = hiltViewModel()
             HomeScreen(
                 viewModel = viewModel,
+                settingsViewModel = settingsViewModel,
                 onNavigateToModule = { moduleId ->
                     navController.navigate(Screen.ModuleLessons.createRoute(moduleId))
                 },
@@ -74,9 +73,7 @@ fun NavGraph(
                 onNavigateToBattle = {
                     navController.navigate(Screen.Battle.route)
                 },
-                onNavigateToSettings = {
-                    navController.navigate(Screen.Settings.route)
-                }
+                onNavigateToSettings = {}
             )
         }
 
@@ -127,12 +124,6 @@ fun NavGraph(
                     if (navController.currentDestination?.route != Screen.Home.route) {
                         navController.popBackStack(Screen.Home.route, inclusive = false)
                     }
-                },
-                onNavigateToShop = {
-                    navController.navigate(Screen.Shop.route)
-                },
-                onNavigateToSettings = {
-                    navController.navigate(Screen.Settings.route)
                 }
             )
         }
@@ -144,23 +135,6 @@ fun NavGraph(
                 onNavigateBack = {
                     if (navController.currentDestination?.route != Screen.Home.route) {
                         navController.popBackStack(Screen.Home.route, inclusive = false)
-                    }
-                }
-            )
-        }
-
-        composable(Screen.Settings.route) {
-            val viewModel: SettingsViewModel = hiltViewModel()
-            SettingsScreen(
-                viewModel = viewModel,
-                isDarkTheme = isDarkTheme,
-                onThemeChange = onThemeChange,
-                onNavigateBack = {
-                    navController.popBackStack()
-                },
-                onNavigateToLogin = {
-                    navController.navigate(Screen.Login.route) {
-                        popUpTo(navController.graph.id) { inclusive = true }
                     }
                 }
             )

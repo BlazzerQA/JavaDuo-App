@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.javadu.data.repository.LessonRepository
 import com.javadu.utils.SharedPrefs
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -14,11 +15,38 @@ class SettingsViewModel @Inject constructor(
     private val sharedPrefs: SharedPrefs
 ) : ViewModel() {
 
-    val isDarkTheme: Boolean
-        get() = sharedPrefs.isDarkTheme
+    fun addCoins(amount: Int) {
+        viewModelScope.launch {
+            val user = repository.currentUser.firstOrNull()
+            user?.let {
+                repository.addCoins(it.id, amount)
+            }
+        }
+    }
 
-    fun setDarkTheme(isDark: Boolean) {
-        sharedPrefs.isDarkTheme = isDark
+    fun addDiamonds(amount: Int) {
+        viewModelScope.launch {
+            val user = repository.currentUser.firstOrNull()
+            user?.let {
+                repository.addDiamonds(it.id, amount)
+            }
+        }
+    }
+
+    fun addXp(amount: Int) {
+        viewModelScope.launch {
+            val user = repository.currentUser.firstOrNull()
+            user?.let {
+                repository.addXp(it.id, amount)
+            }
+        }
+    }
+
+    fun resetProgress() {
+        viewModelScope.launch {
+            repository.resetAllProgress()
+            sharedPrefs.resetTodayXp()
+        }
     }
 
     fun resetAllData(onComplete: () -> Unit) {
