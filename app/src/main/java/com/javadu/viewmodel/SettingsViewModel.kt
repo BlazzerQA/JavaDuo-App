@@ -14,13 +14,6 @@ class SettingsViewModel @Inject constructor(
     private val sharedPrefs: SharedPrefs
 ) : ViewModel() {
 
-    val isDarkTheme: Boolean
-        get() = sharedPrefs.isDarkTheme
-
-    fun setDarkTheme(isDark: Boolean) {
-        sharedPrefs.isDarkTheme = isDark
-    }
-
     fun resetAllData(onComplete: () -> Unit) {
         viewModelScope.launch {
             repository.resetAllData()

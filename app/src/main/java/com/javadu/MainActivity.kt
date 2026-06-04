@@ -58,9 +58,7 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            var isDarkTheme by remember { mutableStateOf(sharedPrefs.isDarkTheme) }
-
-            JavaDuoAppTheme(darkTheme = isDarkTheme) {
+            JavaDuoAppTheme {
                 val navController = rememberNavController()
                 val navBackStackEntry by navController.currentBackStackEntryAsState()
                 val currentRoute = navBackStackEntry?.destination?.route
@@ -83,12 +81,7 @@ class MainActivity : ComponentActivity() {
                             .background(Color.Transparent)
                             .padding(bottom = bottomPadding),
                         navController = navController,
-                        startDestination = startDestination,
-                        isDarkTheme = isDarkTheme,
-                        onThemeChange = { isDark ->
-                            isDarkTheme = isDark
-                            sharedPrefs.isDarkTheme = isDark
-                        }
+                        startDestination = startDestination
                     )
 
                     if (showBottomBar) {
