@@ -37,7 +37,7 @@ import androidx.compose.material.icons.filled.Brightness5
 import androidx.compose.material.icons.filled.Brightness6
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Face
-import androidx.compose.material.icons.filled.ShoppingCart
+
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.LocalCafe
 import androidx.compose.material.icons.filled.MusicNote
@@ -67,9 +67,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -88,7 +86,6 @@ import coil.request.ImageRequest
 import com.javadu.R
 import com.javadu.data.database.entities.LevelInfo
 import com.javadu.ui.theme.DarkBackground
-import com.javadu.ui.theme.ErrorRed
 import com.javadu.ui.theme.JavaGreen
 import com.javadu.viewmodel.ProfileViewModel
 
@@ -96,39 +93,14 @@ import com.javadu.viewmodel.ProfileViewModel
 @Composable
 fun ProfileScreen(
     viewModel: ProfileViewModel,
-    onNavigateBack: () -> Unit,
-    onNavigateToShop: () -> Unit = {}
+    onNavigateBack: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
-    var showResetDialog by remember { mutableStateOf(false) }
 
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri: Uri? ->
         uri?.let { viewModel.updateAvatarUri(it.toString()) }
-    }
-
-    if (showResetDialog) {
-        AlertDialog(
-            onDismissRequest = { showResetDialog = false },
-            title = { Text("Сбросить прогресс?") },
-            text = { Text("Все достижения и прогресс по урокам будут удалены. Это действие нельзя отменить.") },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        viewModel.resetProgress()
-                        showResetDialog = false
-                    }
-                ) {
-                    Text("Сбросить", color = ErrorRed)
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showResetDialog = false }) {
-                    Text("Отмена")
-                }
-            }
-        )
     }
 
     if (state.showAvatarPicker) {
@@ -158,7 +130,7 @@ fun ProfileScreen(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = DarkBackground
+                    containerColor = com.javadu.ui.theme.DarkBackground
                 )
             )
         }
@@ -369,53 +341,6 @@ fun ProfileScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // Магазин
-            Button(
-                onClick = onNavigateToShop,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = JavaGreen.copy(alpha = 0.2f),
-                    contentColor = JavaGreen
-                ),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.ShoppingCart,
-                    contentDescription = null,
-                    modifier = Modifier.size(20.dp)
-                )
-                Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
-                Text(
-                    text = "Магазин бонусов",
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.Medium
-                )
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Кнопка сброса
-            Button(
-                onClick = { showResetDialog = true },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(48.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = ErrorRed.copy(alpha = 0.2f),
-                    contentColor = ErrorRed
-                ),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Text(
-                    text = "Сбросить прогресс",
-                    style = MaterialTheme.typography.labelLarge,
-                    fontWeight = FontWeight.Medium
-                )
-            }
         }
     }
 }

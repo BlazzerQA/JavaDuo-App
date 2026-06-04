@@ -189,7 +189,7 @@ class LessonRepository @Inject constructor(
         userProgressDao.deleteAll()
         moduleProgressDao.deleteAll()
         userDao.getUser().firstOrNull()?.let { user ->
-            userDao.updateUser(user.copy(totalXp = 0))
+            userDao.updateUser(user.copy(totalXp = 0, coins = 0, diamonds = 0))
         }
     }
 

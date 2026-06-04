@@ -8,7 +8,6 @@ import com.javadu.data.database.entities.LevelInfo
 import com.javadu.data.database.entities.User
 import com.javadu.data.repository.LessonRepository
 import com.javadu.utils.AvatarManager
-import com.javadu.utils.SharedPrefs
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +18,6 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
     private val repository: LessonRepository,
-    private val sharedPrefs: SharedPrefs,
     @ApplicationContext private val context: Context
 ) : ViewModel() {
 
@@ -56,22 +54,6 @@ class ProfileViewModel @Inject constructor(
                     _state.value = _state.value.copy(isLoading = false)
                 }
             }
-        }
-    }
-
-    fun refreshLevel() {
-        viewModelScope.launch {
-            val user = state.value.user ?: return@launch
-            val level = repository.getLevelInfo(user.totalXp)
-            _state.value = _state.value.copy(levelInfo = level)
-        }
-    }
-
-    fun resetProgress() {
-        viewModelScope.launch {
-            repository.resetAllProgress()
-            sharedPrefs.resetTodayXp()
-            loadData()
         }
     }
 
