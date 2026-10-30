@@ -27,39 +27,40 @@ object LevelSystem {
     private const val GROWTH_FACTOR = 1.5f
     private const val LEVEL_CAP = 100
 
-    fun getNextLevelThreshold(level: Int): Int {
-        if (level >= LEVEL_CAP) return Int.MAX_VALUE
-        return (BASE_XP * Math.pow(GROWTH_FACTOR.toDouble(), (level - 1).toDouble())).toInt()
+    fun getNextLevelThreshold(level: Int): Int =
+        thresholdOf(level).coerceAtMost(Int.MAX_VALUE.toLong()).toInt()
+
+    /** Порог уровня в Long: начиная с ~43 уровня он не помещается в Int. */
+    private fun thresholdOf(level: Int): Long {
+        if (level >= LEVEL_CAP) return Long.MAX_VALUE
+        return (BASE_XP * Math.pow(GROWTH_FACTOR.toDouble(), (level - 1).toDouble())).toLong()
     }
 
     fun getLevelInfo(totalXp: Int): LevelInfo {
+        // Отрицательный XP (например, «XP до урока» = total - earned) считаем нулём.
+        val xp = totalXp.coerceAtLeast(0).toLong()
         var level = 1
-        var xpNeededForCurrentLevel = 0
-        var xpForNextLevel = getNextLevelThreshold(1)
-        var accumulatedXp = 0
+        var accumulatedXp = 0L
+        var xpForNextLevel = thresholdOf(1)
 
-        while (level < LEVEL_CAP && accumulatedXp + xpForNextLevel <= totalXp) {
+        // Считаем в Long и сравниваем через вычитание: сумма порогов
+        // превышает Int.MAX_VALUE уже на 40 уровне, а сложение могло переполниться.
+        while (level < LEVEL_CAP && xpForNextLevel <= xp - accumulatedXp) {
             accumulatedXp += xpForNextLevel
             level++
-            xpNeededForCurrentLevel = xpForNextLevel
-            xpForNextLevel = getNextLevelThreshold(level)
+            xpForNextLevel = thresholdOf(level)
         }
 
-        val currentLevelThreshold = accumulatedXp
-        val nextLevelThreshold = accumulatedXp + xpForNextLevel
-        val progress = if (nextLevelThreshold > currentLevelThreshold) {
-            ((totalXp - currentLevelThreshold).toFloat() / xpForNextLevel).coerceIn(0f, 1f)
-        } else {
-            1f
-        }
+        val currentXp = xp - accumulatedXp
+        val progress = (currentXp.toFloat() / xpForNextLevel).coerceIn(0f, 1f)
 
         val tier = getTierForLevel(level)
         val title = getTitleForLevel(level, tier)
 
         return LevelInfo(
             level = level,
-            currentXp = totalXp - currentLevelThreshold,
-            nextLevelXp = xpForNextLevel,
+            currentXp = currentXp.toInt(),
+            nextLevelXp = xpForNextLevel.coerceAtMost(Int.MAX_VALUE.toLong()).toInt(),
             progress = progress,
             tier = tier,
             title = title
