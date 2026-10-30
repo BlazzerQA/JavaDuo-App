@@ -25,6 +25,7 @@ class ShopViewModel @Inject constructor(
 
     data class ShopState(
         val coins: Int = 0,
+        val diamonds: Int = 0,
         val bonuses: List<UserBonus> = emptyList(),
         val ownedUnits: List<String> = emptyList(),
         val isLoading: Boolean = true,
@@ -54,6 +55,7 @@ class ShopViewModel @Inject constructor(
                 val ownedUnits = unitRepository.getHiredUnits().firstOrNull()?.map { it.unitId } ?: emptyList()
                 _state.value = _state.value.copy(
                     coins = currentCoins,
+                    diamonds = repository.getUserDiamonds(userId),
                     bonuses = bonuses,
                     ownedUnits = ownedUnits,
                     isLoading = false
@@ -68,9 +70,10 @@ class ShopViewModel @Inject constructor(
             val userId = user?.id ?: 0L
             val ownedUnits = unitRepository.getHiredUnits().firstOrNull()?.map { it.unitId } ?: emptyList()
             _state.value = _state.value.copy(
-                coins = user?.coins ?: 0,
-                ownedUnits = ownedUnits
-            )
+                    coins = user?.coins ?: 0,
+                    diamonds = user?.diamonds ?: 0,
+                    ownedUnits = ownedUnits
+                )
         }
     }
 
@@ -137,7 +140,8 @@ class ShopViewModel @Inject constructor(
                 Log.d(TAG, "New Coins: $newCoins, New Owned Units: $newOwnedUnits")
                 _state.value = _state.value.copy(
                     coins = newCoins,
-                    ownedUnits = newOwnedUnits,
+                    diamonds = repository.getUserDiamonds(userId),
+                    ownedUnits = ownedUnits,
                     purchaseResult = PurchaseResult.Success(newItemName)
                 )
             } else {

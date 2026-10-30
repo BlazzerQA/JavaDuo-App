@@ -16,7 +16,6 @@ class SharedPrefs @Inject constructor(
     companion object {
         private const val PREFS_NAME = "javaduo_prefs"
         private const val KEY_ONBOARDING_SHOWN = "onboarding_shown"
-        private const val KEY_DARK_THEME = "dark_theme"
         private const val KEY_DAILY_GOAL = "daily_goal"
         private const val KEY_LAST_ACTIVE_DATE = "last_active_date"
         private const val KEY_TODAY_XP = "today_xp"
@@ -26,10 +25,6 @@ class SharedPrefs @Inject constructor(
     var isOnboardingShown: Boolean
         get() = prefs.getBoolean(KEY_ONBOARDING_SHOWN, false)
         set(value) = prefs.edit().putBoolean(KEY_ONBOARDING_SHOWN, value).apply()
-
-    var isDarkTheme: Boolean
-        get() = prefs.getBoolean(KEY_DARK_THEME, true)
-        set(value) = prefs.edit().putBoolean(KEY_DARK_THEME, value).apply()
 
     var dailyGoal: Int
         get() = prefs.getInt(KEY_DAILY_GOAL, 50)

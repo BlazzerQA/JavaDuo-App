@@ -11,7 +11,6 @@ sealed class Screen(val route: String) {
         fun createRoute(moduleId: Long) = "module_lessons/$moduleId"
     }
     object Profile : Screen("profile")
-    object Settings : Screen("settings")
     object Shop : Screen("shop")
     object Battle : Screen("battle")
 }

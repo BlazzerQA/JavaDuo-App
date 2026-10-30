@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,7 +23,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Star
@@ -59,6 +59,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import com.javadu.data.database.entities.LevelSystem
 import com.javadu.ui.components.QuestionCard
 import com.javadu.ui.theme.DarkBackground
@@ -66,6 +67,7 @@ import com.javadu.ui.theme.ErrorRed
 import com.javadu.ui.theme.JavaGreen
 import com.javadu.ui.theme.SuccessGreen
 import com.javadu.viewmodel.LessonViewModel
+import com.javadu.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -712,14 +714,13 @@ private fun CompletionScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.AccountBalanceWallet,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(24.dp)
+                    Image(
+                        painter = painterResource(R.drawable.top_ic_coin),
+                        contentDescription = "Монеты",
+                        modifier = Modifier.size(28.dp)
                     )
                     Text(
-                        text = "+$earnedCoins Coins",
+                        text = "+$earnedCoins",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurfaceVariant

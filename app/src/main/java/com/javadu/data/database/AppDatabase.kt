@@ -36,8 +36,8 @@ import com.javadu.data.database.entities.UserUnit
         Unit::class,
         UserUnit::class
     ],
-    version = 7,
-    exportSchema = false
+    version = AppDatabase.VERSION,
+    exportSchema = true
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -50,4 +50,9 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun interviewQuestionDao(): InterviewQuestionDao
     abstract fun userBonusDao(): UserBonusDao
     abstract fun unitDao(): UnitDao
+
+    companion object {
+        /** Текущая версия схемы. Меняется только вместе с миграцией в DatabaseMigrations. */
+        const val VERSION = 8
+    }
 }

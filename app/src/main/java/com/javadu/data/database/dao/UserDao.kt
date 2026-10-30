@@ -38,6 +38,12 @@ interface UserDao {
     @Query("UPDATE users SET coins = coins - :coins WHERE id = :userId AND coins >= :coins")
     suspend fun spendCoins(userId: Long, coins: Int): Int
 
+    @Query("UPDATE users SET diamonds = diamonds + :diamonds WHERE id = :userId")
+    suspend fun addDiamonds(userId: Long, diamonds: Int)
+
+    @Query("UPDATE users SET diamonds = diamonds - :diamonds WHERE id = :userId AND diamonds >= :diamonds")
+    suspend fun spendDiamonds(userId: Long, diamonds: Int): Int
+
     @Query("UPDATE users SET avatarUri = :avatarUri WHERE id = :userId")
     suspend fun updateAvatarUri(userId: Long, avatarUri: String?)
 

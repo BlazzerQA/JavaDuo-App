@@ -48,6 +48,12 @@ android {
     }
 }
 
+// Room выгружает схему каждой версии БД в app/schemas — эти файлы нужно коммитить,
+// по ним пишутся и проверяются миграции
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+}
+
 dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
@@ -82,6 +88,10 @@ dependencies {
 
     // Coil
     implementation(libs.coil.compose)
+
+    // Media3 for video playback
+    implementation("androidx.media3:media3-exoplayer:1.4.1")
+    implementation("androidx.media3:media3-ui:1.4.1")
 
     // Gson
     implementation(libs.gson)

@@ -184,7 +184,7 @@
   {"lessonId":17, "questionText":"Как перезапустить сервис в compose?", "correctAnswer":"docker-compose restart web", "option1":"docker restart web", "option2":"docker-compose restart web", "option3":"docker up web"},
   {"lessonId":17, "questionText":"bridge network — это?", "correctAnswer":"Сеть по умолчанию", "option1":"Публичная сеть", "option2":"Сеть по умолчанию", "option3":"VPN"},
   {"lessonId":17, "questionText":"Для персистентности данных используют?", "correctAnswer":"Volumes", "option1":"Images", "option2":"Volumes", "option3":"Networks"},
-  {"lessonId":17, "questionText":"environment в docker-compose — для чего?", "correctAnswer":"Переменные окружения", "option1":"Портов", "option2":"Переменных окружения", "option3":"Томов"},
+  {"lessonId":17, "questionText":"environment в docker-compose — для чего?", "correctAnswer":"Переменных окружения", "option1":"Портов", "option2":"Переменных окружения", "option3":"Томов"},
 
   {"lessonId":18, "questionText":"Многостадийная сборка — это?", "correctAnswer":"Использование нескольких FROM", "option1":"Один образ", "option2":"Использование нескольких FROM", "option3":"Dockerfile без слоёв"},
   {"lessonId":18, "questionText":"Преимущество многостадийной сборки?", "correctAnswer":"Меньше размер финального образа", "option1":"Больше слоёв", "option2":"Меньше размер финального образа", "option3":"Быстрее клонирование"},
