@@ -8,12 +8,15 @@ import org.junit.Test
  * Фиксирует текущее поведение системы уровней.
  *
  * Формула: порог уровня N = 100 * 1.5^(N-1), суммарный XP накапливается.
- * Проверки ограничены диапазоном XP, достижимым в Int без переполнения
- * (уровни 1..39). Начиная с ~1.47 млрд XP (порог 40 уровня) сумма в Int
- * переполняется и игрок прыгает на 100 уровень — известный баг,
- * см. отчёт этапа 0.
+ * XP хранится в Int, поэтому максимально достижимый уровень — 40
+ * (порог 40 уровня ≈ 1.47 млрд XP). Расчёт внутри идёт в Long без переполнения.
  */
 class LevelSystemTest {
+
+    private companion object {
+        /** Шаг перебора XP: простое число, чтобы не попадать только на «круглые» значения. */
+        const val STEP = 9_999_991
+    }
 
     /** Суммарный XP, необходимый, чтобы достичь уровня [level]. */
     private fun xpToReach(level: Int): Int {
@@ -78,10 +81,10 @@ class LevelSystemTest {
         assertEquals(4, LevelSystem.getLevelInfo(475).level)
     }
 
-    /** xpToReach согласован с getLevelInfo на всём достижимом диапазоне (уровни 2..39). */
+    /** xpToReach согласован с getLevelInfo для всех достижимых уровней (2..40). */
     @Test
-    fun xpToReachMatchesGetLevelInfoInReachableRange() {
-        for (level in 2..39) {
+    fun xpToReachMatchesGetLevelInfoForAllReachableLevels() {
+        for (level in 2..40) {
             val xp = xpToReach(level)
             assertEquals("ровно $xp XP", level, LevelSystem.getLevelInfo(xp).level)
             assertEquals("$xp - 1 XP", level - 1, LevelSystem.getLevelInfo(xp - 1).level)
@@ -98,7 +101,7 @@ class LevelSystemTest {
             11 to LevelInfo.Tier.JUNIOR,
             20 to LevelInfo.Tier.JUNIOR,
             21 to LevelInfo.Tier.MID,
-            39 to LevelInfo.Tier.MID
+            40 to LevelInfo.Tier.MID
         )
         expected.forEach { (level, tier) ->
             assertEquals("уровень $level", tier, LevelSystem.getLevelInfo(xpToReach(level)).tier)
@@ -112,19 +115,54 @@ class LevelSystemTest {
         assertEquals("Junior QA", LevelSystem.getLevelInfo(xpToReach(11)).title)
     }
 
-    /** Инварианты прогресса: уровень не убывает, progress в [0,1], currentXp < nextLevelXp. */
+    /** Инварианты прогресса на всём диапазоне Int: уровень не убывает, progress в [0,1], currentXp < nextLevelXp. */
     @Test
     fun progressInvariantsHoldInReachableRange() {
         var previousLevel = 0
         var xp = 0
-        while (xp <= 1_000_000_000) {
+        while (xp in 0..Int.MAX_VALUE - STEP) {
             val info = LevelSystem.getLevelInfo(xp)
             assertTrue("уровень не убывает при $xp XP", info.level >= previousLevel)
             assertTrue("progress в [0,1] при $xp XP", info.progress in 0f..1f)
             assertTrue("currentXp в [0, nextLevelXp) при $xp XP",
                 info.currentXp in 0 until info.nextLevelXp)
             previousLevel = info.level
-            xp += 997_013
+            xp += STEP
         }
+    }
+
+    /** Регрессия: при Int.MAX_VALUE XP сумма порогов не переполняется и уровень не прыгает на 100. */
+    @Test
+    fun maxIntXpDoesNotOverflow() {
+        val info = LevelSystem.getLevelInfo(Int.MAX_VALUE)
+        assertEquals(40, info.level)
+        assertEquals(LevelInfo.Tier.MID, info.tier)
+        assertEquals(Int.MAX_VALUE - xpToReach(40), info.currentXp)
+        assertEquals(LevelSystem.getNextLevelThreshold(40), info.nextLevelXp)
+        assertTrue(info.progress in 0f..1f)
+    }
+
+    /** Регрессия: порог 40 уровня (≈1.47 млрд XP) раньше давал 100 уровень и тир GRANDMASTER. */
+    @Test
+    fun level40ThresholdGivesLevel40() {
+        val info = LevelSystem.getLevelInfo(xpToReach(40))
+        assertEquals(40, info.level)
+        assertEquals(0, info.currentXp)
+    }
+
+    /** Отрицательный XP считается нулём: 1 уровень и неотрицательный currentXp. */
+    @Test
+    fun negativeXpIsTreatedAsZero() {
+        val info = LevelSystem.getLevelInfo(-50)
+        assertEquals(1, info.level)
+        assertEquals(0, info.currentXp)
+        assertEquals(0f, info.progress, 0.0001f)
+    }
+
+    /** Порог, не помещающийся в Int (с 43 уровня), ограничивается Int.MAX_VALUE. */
+    @Test
+    fun thresholdAboveIntRangeIsCappedAtIntMax() {
+        assertTrue(LevelSystem.getNextLevelThreshold(42) < Int.MAX_VALUE)
+        assertEquals(Int.MAX_VALUE, LevelSystem.getNextLevelThreshold(43))
     }
 }

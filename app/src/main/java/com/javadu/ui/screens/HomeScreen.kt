@@ -66,11 +66,9 @@ fun HomeScreen(
         Scaffold(
             topBar = {
                 state.user?.let { user ->
-                    val levelInfo = LevelSystem.getLevelInfo(user.totalXp)
                     CustomTopBar(
                         user = user,
-                        currentXp = levelInfo.currentXp,
-                        nextLevelXp = levelInfo.nextLevelXp,
+                        levelInfo = LevelSystem.getLevelInfo(user.totalXp),
                         onNavigateToSettings = { showSettingsDialog = true }
                     )
                 }

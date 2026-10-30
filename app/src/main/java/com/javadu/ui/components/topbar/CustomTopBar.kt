@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.javadu.R
+import com.javadu.data.database.entities.LevelInfo
 import com.javadu.data.database.entities.User
 import com.javadu.ui.theme.DiamondsGradient
 import com.javadu.ui.theme.GoldColor
@@ -18,8 +19,7 @@ import com.javadu.ui.theme.GoldColor
 @Composable
 fun CustomTopBar(
     user: User?,
-    currentXp: Int,
-    nextLevelXp: Int,
+    levelInfo: LevelInfo,
     onNavigateToSettings: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -31,8 +31,7 @@ fun CustomTopBar(
     ) {
         PlayerProfileCard(
             user = user,
-            currentXp = currentXp,
-            nextLevelXp = nextLevelXp,
+            levelInfo = levelInfo,
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .padding(horizontal = 8.dp, vertical = 8.dp)

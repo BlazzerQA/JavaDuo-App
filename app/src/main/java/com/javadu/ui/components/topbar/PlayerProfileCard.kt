@@ -18,21 +18,24 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.javadu.data.database.entities.LevelInfo
 import com.javadu.data.database.entities.User
 import com.javadu.ui.theme.*
 
 @Composable
 fun PlayerProfileCard(
     user: User?,
-    modifier: Modifier = Modifier,
-    currentXp: Int = 1250,
-    nextLevelXp: Int = 2000
+    levelInfo: LevelInfo,
+    modifier: Modifier = Modifier
 ) {
     val avatarWidth = 66.dp
     val textStartPadding = avatarWidth + 8.dp
 
-    val progress = if (nextLevelXp > 0) (currentXp.toFloat() / nextLevelXp).coerceIn(0f, 1f) else 0f
-    val level = user?.let { (it.totalXp / 100) + 1 } ?: 12
+    // Уровень и прогресс берём из LevelSystem, чтобы топбар совпадал с профилем
+    val level = levelInfo.level
+    val currentXp = levelInfo.currentXp
+    val nextLevelXp = levelInfo.nextLevelXp
+    val progress = levelInfo.progress
 
     // ГЛАВНЫЙ КОНТЕЙНЕР (Слоеный Box)
     Box(
