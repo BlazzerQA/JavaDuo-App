@@ -78,8 +78,5 @@ reports/
 # Log files
 *.log
 
-# Room schema exports (если включены)
-*/schemas/
-
 # Compose preview / inspection
 inspection/

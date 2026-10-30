@@ -48,6 +48,12 @@ android {
     }
 }
 
+// Room выгружает схему каждой версии БД в app/schemas — эти файлы нужно коммитить,
+// по ним пишутся и проверяются миграции
+ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+}
+
 dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)

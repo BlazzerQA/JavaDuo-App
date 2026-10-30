@@ -12,6 +12,7 @@ import com.javadu.data.database.dao.UnitDao
 import com.javadu.data.database.dao.UserBonusDao
 import com.javadu.data.database.dao.UserDao
 import com.javadu.data.database.dao.UserProgressDao
+import com.javadu.data.database.migrations.DatabaseMigrations
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -31,7 +32,12 @@ object DatabaseModule {
             AppDatabase::class.java,
             "javaduo_database"
         )
-            .fallbackToDestructiveMigration()
+            // Явные миграции сохраняют прогресс игрока при обновлении схемы
+            .addMigrations(*DatabaseMigrations.ALL)
+            // Старые версии без истории схем — пересоздаём (данные перенести нечем)
+            .fallbackToDestructiveMigrationFrom(*DatabaseMigrations.LEGACY_DESTRUCTIVE_VERSIONS)
+            // Установка более старой сборки поверх новой (только при разработке) — без краша
+            .fallbackToDestructiveMigrationOnDowngrade()
             .build()
     }
 
